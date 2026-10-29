@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Microsoft Fabric Study Guide &amp; Reference</title>
+<style>
+:root{
+  --bg:#0f172a;--panel:#1e293b;--panel2:#162033;--text:#e2e8f0;--muted:#94a3b8;--border:#334155;
+  --accent:#38bdf8;--accent2:#818cf8;--code-bg:#0b1220;--warn:#f59e0b;--ok:#34d399;
+  --t-kw:#c084fc;--t-str:#86efac;--t-com:#64748b;--t-num:#fbbf24;--t-fn:#38bdf8;--t-dec:#fb923c;
+}
+[data-theme="light"]{
+  --bg:#f8fafc;--panel:#ffffff;--panel2:#f1f5f9;--text:#0f172a;--muted:#475569;--border:#cbd5e1;
+  --accent:#0369a1;--accent2:#4f46e5;--code-bg:#f1f5f9;--warn:#b45309;--ok:#047857;
+  --t-kw:#7e22ce;--t-str:#15803d;--t-com:#64748b;--t-num:#b45309;--t-fn:#0369a1;--t-dec:#c2410c;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.65 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 24px;background:var(--panel);border-bottom:1px solid var(--border)}
+header h1{font-size:1.1rem;margin:0}
+header h1 span{color:var(--accent)}
+button.toggle{background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit;font-size:.85rem}
+.layout{display:grid;grid-template-columns:260px minmax(0,1fr);max-width:1300px;margin:0 auto;gap:32px;padding:24px}
+nav{position:sticky;top:76px;align-self:start;max-height:calc(100vh - 100px);overflow:auto;font-size:.9rem;padding-right:8px}
+nav a{display:block;color:var(--muted);text-decoration:none;padding:4px 10px;border-left:2px solid var(--border)}
+nav a:hover,nav a.active{color:var(--accent);border-left-color:var(--accent)}
+nav a.sub{padding-left:24px;font-size:.85rem}
+nav .mod{margin-top:12px;font-weight:600;color:var(--text);padding:4px 10px;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em}
+main{min-width:0;max-width:900px}
+section{margin-bottom:56px}
+h2{font-size:1.7rem;margin:0 0 6px;padding-bottom:8px;border-bottom:2px solid var(--accent)}
+h2 .n{color:var(--accent2);margin-right:8px}
+h3{font-size:1.2rem;margin:32px 0 8px;color:var(--accent)}
+ul,ol{padding-left:22px}
+code{font-family:"JetBrains Mono","Fira Code",Consolas,monospace;font-size:.88em;background:var(--panel2);border:1px solid var(--border);padding:1px 6px;border-radius:5px}
+pre{position:relative;background:var(--code-bg);border:1px solid var(--border);border-radius:10px;padding:16px;overflow:auto;margin:12px 0 18px}
+pre[data-lang]::before{content:attr(data-lang);position:absolute;top:6px;right:60px;font-size:.7rem;text-transform:uppercase;color:var(--muted);letter-spacing:.06em}
+pre code{background:none;border:0;padding:0;font-size:.85rem;line-height:1.55;display:block;white-space:pre}
+.copy{position:absolute;top:5px;right:8px;background:var(--panel2);color:var(--muted);border:1px solid var(--border);border-radius:6px;font-size:.7rem;padding:2px 8px;cursor:pointer}
+.k{color:var(--t-kw);font-weight:600}.s{color:var(--t-str)}.c{color:var(--t-com);font-style:italic}.m{color:var(--t-num)}.f{color:var(--t-fn)}.d{color:var(--t-dec)}
+table{width:100%;border-collapse:collapse;margin:12px 0 20px;font-size:.92rem;display:block;overflow-x:auto}
+th,td{border:1px solid var(--border);padding:8px 12px;text-align:left;vertical-align:top}
+th{background:var(--panel2);color:var(--accent)}
+.callout{border-left:4px solid var(--accent);background:var(--panel);padding:10px 16px;border-radius:0 8px 8px 0;margin:14px 0}
+.callout.warn{border-color:var(--warn)}.callout.tip{border-color:var(--ok)}
+.callout b.t{display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.diagram{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px;font-family:Consolas,monospace;font-size:.82rem;overflow:auto;white-space:pre;color:var(--muted)}
+details{background:var(--panel);border:1px solid var(--border);border-radius:10px;margin:10px 0}
+details summary{cursor:pointer;padding:12px 16px;font-weight:600;list-style:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"Q";display:inline-block;background:var(--accent2);color:#fff;border-radius:6px;padding:0 7px;margin-right:10px;font-size:.8rem}
+details[open] summary{border-bottom:1px solid var(--border);color:var(--accent)}
+details .ans{padding:6px 16px 12px}
+.toolbar{margin:8px 0 16px;display:flex;gap:8px;flex-wrap:wrap}
+footer{text-align:center;color:var(--muted);padding:24px;font-size:.85rem;border-top:1px solid var(--border)}
+@media(max-width:900px){.layout{grid-template-columns:1fr;padding:16px}nav{position:static;max-height:none;border-bottom:1px solid var(--border);padding-bottom:12px}}
+</style>
+</head>
+<body>
+<header>
+  <h1><span>🧵</span> Microsoft Fabric Study Guide &amp; Reference</h1>
+  <button class="toggle" id="themeBtn" type="button">Toggle light/dark</button>
+</header>
+<div class="layout">
+<nav id="toc">
+  <div class="mod">1 · Platform</div>
+  <a href="#overview" class="sub">What is Fabric</a>
+  <a href="#onelake" class="sub">OneLake, shortcuts, mirroring</a>
+  <a href="#capacity" class="sub">Capacity &amp; workspaces</a>
+  <div class="mod">2 · Data Engineering</div>
+  <a href="#lakehouse" class="sub">Lakehouse</a>
+  <a href="#notebooks" class="sub">Notebooks &amp; Spark</a>
+  <a href="#delta" class="sub">Delta, V-Order, maintenance</a>
+  <div class="mod">3 · Warehousing</div>
+  <a href="#warehouse" class="sub">Warehouse (T-SQL)</a>
+  <a href="#lhvswh" class="sub">Lakehouse vs Warehouse</a>
+  <div class="mod">4 · Integration</div>
+  <a href="#pipelines" class="sub">Data Factory pipelines</a>
+  <a href="#dataflows" class="sub">Dataflows Gen2</a>
+  <a href="#incremental" class="sub">Incremental load pattern</a>
+  <div class="mod">5 · Real-Time &amp; BI</div>
+  <a href="#rti" class="sub">Real-Time Intelligence / KQL</a>
+  <a href="#pbi" class="sub">Power BI &amp; Direct Lake</a>
+  <div class="mod">6 · Architecture &amp; Ops</div>
+  <a href="#medallion" class="sub">Medallion end-to-end</a>
+  <a href="#security" class="sub">Security &amp; governance</a>
+  <a href="#alm" class="sub">Git, CI/CD, monitoring</a>
+  <a href="#tuning" class="sub">Performance tuning</a>
+  <div class="mod">7 · Interview</div>
+  <a href="#qa" class="sub">Interview Q&amp;A</a>
+  <a href="#cheat" class="sub">Cheat sheet &amp; compare</a>
+</nav>
+<main>
+
+<!-- ============ PLATFORM ============ -->
+<section id="overview">
+<h2><span class="n">1</span>What is Microsoft Fabric?</h2>
+<p><b>Microsoft Fabric</b> is a unified, SaaS analytics platform that brings data integration, data engineering, data warehousing, data science, real-time analytics and business intelligence (Power BI) into one product. All workloads share <b>one storage layer (OneLake)</b>, one capacity-based billing model, one security/governance model (Microsoft Purview) and one UI.</p>
+<div class="diagram">┌──────────────────────── Microsoft Fabric (SaaS) ────────────────────────┐
+│ Data Factory │ Data Engineering │ Data Science │ Data Warehouse │ Real-Time │ Power BI │
+│ (pipelines,  │ (Lakehouse,      │ (ML models,  │ (T-SQL         │ (Eventhouse│ (reports,│
+│  Dataflows)  │  Spark notebooks)│  experiments)│  warehouse)    │  KQL, Eventstream)│ Direct Lake)│
+├──────────────────────────────────────────────────────────────────────────┤
+│                  OneLake  –  one logical data lake (Delta/Parquet)                │
+├──────────────────────────────────────────────────────────────────────────┤
+│        Capacity (F SKUs / Trial)  ·  Purview governance  ·  Entra ID security     │
+└──────────────────────────────────────────────────────────────────────────┘</div>
+<table>
+<tr><th>Workload / item</th><th>Purpose</th></tr>
+<tr><td><b>Lakehouse</b></td><td>Files + Delta tables in OneLake; Spark for engineering; auto SQL analytics endpoint (read-only T-SQL)</td></tr>
+<tr><td><b>Warehouse</b></td><td>Full T-SQL (DDL/DML) relational warehouse, data stored as Delta in OneLake</td></tr>
+<tr><td><b>Notebook</b></td><td>PySpark / Spark SQL / Scala / R / T-SQL(preview) code, scheduled or orchestrated</td></tr>
+<tr><td><b>Data pipeline</b></td><td>Orchestration + Copy activity (ADF-style) with 100+ connectors</td></tr>
+<tr><td><b>Dataflow Gen2</b></td><td>Low-code Power Query ETL, writes to Lakehouse/Warehouse</td></tr>
+<tr><td><b>Eventstream / Eventhouse</b></td><td>Real-time ingestion and KQL database for time-series/telemetry</td></tr>
+<tr><td><b>Activator</b></td><td>No-code triggers/alerts on data conditions</td></tr>
+<tr><td><b>Semantic model / Report</b></td><td>Power BI datasets and visuals; <b>Direct Lake</b> mode reads OneLake directly</td></tr>
+<tr><td><b>Environment</b></td><td>Reusable Spark settings, libraries and compute configuration</td></tr>
+<tr><td><b>Mirrored database</b></td><td>Near-real-time replica of external databases (e.g. Azure SQL, Cosmos DB, Snowflake) in OneLake</td></tr>
+</table>
+<div class="callout tip"><b class="t">Mental model</b>"OneDrive for data": all items store data as <b>Delta Parquet in OneLake</b>, so a table written by Spark can be queried by T-SQL, KQL and Power BI without copying.</div>
+<div class="callout warn"><b class="t">Note</b>Fabric changes quickly (preview features become GA, names change). Treat feature availability in this guide as a study baseline and confirm against the current Microsoft Learn documentation.</div>
+</section>
+
+<section id="onelake">
+<h2><span class="n">1.1</span>OneLake, Shortcuts &amp; Mirroring</h2>
+<ul>
+<li><b>OneLake</b> is automatically provisioned per tenant – one logical lake built on ADLS Gen2, with an ADLS-compatible API (DFS endpoint) so existing tools work.</li>
+<li>Hierarchy: <b>Tenant → Workspace → Item (Lakehouse/Warehouse…) → Tables/Files</b>.</li>
+<li>Default format for tables is <b>Delta Lake</b> (Parquet + transaction log).</li>
+</ul>
+<pre data-lang="text"><code>abfss://&lt;workspace&gt;@onelake.dfs.fabric.microsoft.com/&lt;lakehouse&gt;.Lakehouse/Tables/orders
+abfss://&lt;workspace&gt;@onelake.dfs.fabric.microsoft.com/&lt;lakehouse&gt;.Lakehouse/Files/raw/2026/10/orders.csv
+https://onelake.dfs.fabric.microsoft.com/&lt;workspace&gt;/&lt;lakehouse&gt;.Lakehouse/Files/...   (ADLS Gen2 REST)</code></pre>
+<h3>Shortcuts – reference data without copying</h3>
+<p>A <b>shortcut</b> is a pointer in a Lakehouse (or KQL database) to data elsewhere: another Fabric item/workspace, <b>ADLS Gen2, Amazon S3, S3-compatible, Google Cloud Storage, Dataverse</b>, and more. It appears as a folder/table; reads go to the source (cached optionally).</p>
+<ul>
+<li>Shortcut under <code>Tables/</code> pointing to a Delta folder → shows up as a queryable table.</li>
+<li>Shortcut under <code>Files/</code> → any file format, raw access.</li>
+<li>Deleting a shortcut does <b>not</b> delete source data (but deleting data <i>through</i> a shortcut path may affect the target depending on permissions).</li>
+</ul>
+<h3>Mirroring</h3>
+<p>Continuously replicates an operational database into OneLake as Delta tables with no ETL (supported sources include Azure SQL Database, Azure Cosmos DB, Snowflake, and others, with the list growing). Replication compute is free of capacity charge; query/transform compute is not. <b>Use when</b> you need analytics on operational data with minimal latency and no pipeline maintenance.</p>
+<table>
+<tr><th></th><th>Shortcut</th><th>Mirroring</th><th>Copy (pipeline)</th></tr>
+<tr><td>Data moved?</td><td>No (virtual)</td><td>Yes, automatically replicated</td><td>Yes, you manage it</td></tr>
+<tr><td>Freshness</td><td>Always current</td><td>Near real-time</td><td>Per schedule</td></tr>
+<tr><td>Sources</td><td>Lake storage / Fabric</td><td>Supported databases</td><td>100+ connectors</td></tr>
+<tr><td>Transformation</td><td>None</td><td>None (replica)</td><td>Optional</td></tr>
+</table>
+</section>
+
+<section id="capacity">
+<h2><span class="n">1.2</span>Capacity, Licensing &amp; Workspaces</h2>
+<ul>
+<li><b>Capacity</b> = pool of compute (<b>Capacity Units, CU</b>) purchased as an Azure <b>F SKU</b> (F2, F4, F8 … F2048) or <b>Trial</b>. All workloads draw from the same pool, which is shared by every workspace assigned to the capacity.</li>
+<li>F2–F32 and smaller SKUs can be paused/resumed and scaled in Azure; Power BI content consumers on SKUs below F64 need <b>Power BI Pro/PPU</b> licenses, while F64+ allows free viewers.</li>
+<li><b>Bursting and smoothing:</b> short spikes are allowed and averaged over time (background operations smoothed over 24 hours, interactive over a short window); sustained overuse leads to <b>throttling</b> (delays → rejection).</li>
+<li>Monitor with the <b>Fabric Capacity Metrics app</b>; reduce cost by pausing dev capacities, right-sizing, optimizing heavy jobs and scheduling off-peak.</li>
+</ul>
+<h3>Workspaces and roles</h3>
+<table>
+<tr><th>Role</th><th>Can do</th></tr>
+<tr><td>Admin</td><td>Everything incl. manage access and delete workspace</td></tr>
+<tr><td>Member</td><td>Create/edit/delete items, share, manage most permissions</td></tr>
+<tr><td>Contributor</td><td>Create/edit items and run jobs; no permission management</td></tr>
+<tr><td>Viewer</td><td>Read-only (view items/reports, query SQL endpoint depending on settings)</td></tr>
+</table>
+<div class="callout tip"><b class="t">Practice</b>Separate workspaces per layer/environment (e.g. <code>bronze-dev</code>, <code>silver-prod</code>, <code>gold-prod</code>) to control access and promote through deployment pipelines.</div>
+</section>
+
+<!-- ============ DATA ENGINEERING ============ -->
+<section id="lakehouse">
+<h2><span class="n">2</span>Lakehouse</h2>
+<p>A Lakehouse combines the flexibility of a data lake (any file) with the structure of a warehouse (Delta tables). Creating one produces three artifacts automatically: the <b>Lakehouse</b> itself, a <b>SQL analytics endpoint</b> and a <b>default semantic model</b>.</p>
+<table>
+<tr><th>Area</th><th>Contains</th><th>Notes</th></tr>
+<tr><td><code>Tables/</code></td><td>Managed Delta tables (and shortcut tables)</td><td>Auto-discovered by the SQL endpoint; use for curated data</td></tr>
+<tr><td><code>Files/</code></td><td>Unmanaged files: CSV, JSON, Parquet, images…</td><td>Landing zone / bronze raw files; not exposed to SQL endpoint</td></tr>
+<tr><td>SQL analytics endpoint</td><td>Read-only T-SQL over Delta tables</td><td>Views, functions, procedures allowed; no INSERT/UPDATE on tables</td></tr>
+<tr><td>Schemas (optional)</td><td>Organize tables as <code>schema.table</code></td><td>Enable at Lakehouse creation (e.g. <code>bronze</code>, <code>silver</code>)</td></tr>
+</table>
+<div class="callout warn"><b class="t">SQL endpoint sync</b>The SQL endpoint picks up new/changed Delta tables with a short metadata sync delay. If a table just written by Spark isn't visible, wait or trigger a refresh of the endpoint metadata.</div>
+<div class="callout"><b class="t">Table naming</b>Avoid spaces and special characters in table/column names – they cause problems in the SQL endpoint and downstream tools. Delta features such as column mapping need care when enabled.</div>
+</section>
+
+<section id="notebooks">
+<h2><span class="n">2.1</span>Notebooks &amp; Spark in Fabric</h2>
+<p>Fabric runs Apache Spark with <b>Starter pools</b> (pre-warmed, sessions start in seconds) and custom pools; <b>Environments</b> hold libraries and Spark properties. A <b>default Lakehouse</b> can be attached to a notebook so relative paths (<code>Files/...</code>, <code>Tables/...</code>) and table names resolve automatically.</p>
+<pre data-lang="python"><code># ---- Read raw files from the attached Lakehouse (relative path) ----
+raw = (spark.read.option("header", True).option("inferSchema", True)
+         .csv("Files/raw/orders/*.csv"))
+
+# ---- Write a managed Delta table (shows up under Tables/) ----
+(raw.write.format("delta").mode("overwrite")
+    .option("overwriteSchema", "true")
+    .saveAsTable("bronze_orders"))                  # with schemas enabled: "bronze.orders"
+
+# ---- Read it back via name or SQL ----
+df = spark.read.table("bronze_orders")
+spark.sql("SELECT COUNT(*) AS n FROM bronze_orders").show()
+
+# ---- Absolute OneLake path (works across workspaces/lakehouses) ----
+path = "abfss://MyWorkspace@onelake.dfs.fabric.microsoft.com/Sales.Lakehouse/Tables/orders"
+other = spark.read.format("delta").load(path)
+
+# ---- Write files (e.g. export) ----
+df.write.mode("overwrite").parquet("Files/exports/orders_parquet")</code></pre>
+<h3>notebookutils (formerly mssparkutils)</h3>
+<pre data-lang="python"><code>notebookutils.fs.ls("Files/raw")                        # list files
+notebookutils.fs.mkdirs("Files/archive")
+notebookutils.fs.cp("Files/raw/a.csv", "Files/archive/a.csv")
+notebookutils.fs.mv("Files/raw/a.csv", "Files/archive/a.csv", True)
+notebookutils.fs.rm("Files/tmp", True)                   # recursive
+
+# Run another notebook and get its exit value (orchestration inside notebooks)
+result = notebookutils.notebook.run("Silver_Orders", 600, {"run_date": "2026-10-30"})
+notebookutils.notebook.exit("done")                      # return a value to the caller / pipeline
+
+# Secrets from Azure Key Vault
+secret = notebookutils.credentials.getSecret("https://myvault.vault.azure.net/", "sql-password")
+token  = notebookutils.credentials.getToken("storage")
+
+# Parallel notebook runs (DAG)
+notebookutils.notebook.runMultiple(["NB_A", "NB_B"])</code></pre>
+<h3>Parameterizing notebooks for pipelines</h3>
+<p>Mark a cell as a <b>parameter cell</b> (cell menu → Toggle parameter cell). A pipeline Notebook activity can then override these values at run time.</p>
+<pre data-lang="python"><code># [parameter cell]
+run_date   = "2026-01-01"
+source_tbl = "bronze_orders"
+full_load  = False</code></pre>
+<h3>Upsert with Delta MERGE</h3>
+<pre data-lang="python"><code>from delta.tables import DeltaTable
+from pyspark.sql import functions as F, Window
+
+updates = (spark.read.table("bronze_orders")
+             .filter(F.col("ingest_date") == run_date))
+w = Window.partitionBy("order_id").orderBy(F.col("updated_at").desc())
+updates = updates.withColumn("rn", F.row_number().over(w)).filter("rn = 1").drop("rn")
+
+tgt = DeltaTable.forName(spark, "silver_orders")
+(tgt.alias("t").merge(updates.alias("s"), "t.order_id = s.order_id")
+    .whenMatchedUpdateAll(condition="s.updated_at &gt; t.updated_at")
+    .whenNotMatchedInsertAll()
+    .execute())</code></pre>
+<div class="callout tip"><b class="t">Tips</b>Use <b>High-concurrency mode</b> to share one Spark session across notebooks (cheaper and faster to start). Enable the <b>Native Execution Engine</b> (Velox/Gluten based) in the Environment for faster Spark SQL/DataFrame processing on supported operations. Keep <code>spark.sql.shuffle.partitions</code> and AQE settings tuned as on any Spark platform.</div>
+</section>
+
+<section id="delta">
+<h2><span class="n">2.2</span>Delta Tables, V-Order &amp; Maintenance</h2>
+<ul>
+<li><b>V-Order:</b> a Microsoft write-time Parquet optimization (sorting/encoding/compression) that makes reads faster across Fabric engines (especially Power BI Direct Lake and SQL endpoint). Enabled by default for some workloads; may slightly slow writes – consider disabling in write-heavy bronze layers.</li>
+<li><b>Small-file problem:</b> many tiny files hurt read performance; compact them regularly.</li>
+<li><b>Optimize Write</b> and auto-compaction settings reduce small files at write time.</li>
+</ul>
+<pre data-lang="sql"><code>-- Spark SQL in a notebook
+OPTIMIZE silver_orders;                                 -- compact small files
+OPTIMIZE silver_orders VORDER;                          -- compact + apply V-Order
+OPTIMIZE silver_orders ZORDER BY (customer_id);         -- co-locate by column for faster filters
+VACUUM silver_orders RETAIN 168 HOURS;                  -- remove unreferenced files (default 7 days)
+DESCRIBE HISTORY silver_orders;                         -- audit / time travel
+SELECT * FROM silver_orders VERSION AS OF 5;
+RESTORE TABLE silver_orders TO VERSION AS OF 5;</code></pre>
+<pre data-lang="python"><code># Session-level Spark settings (examples – verify exact names for your runtime)
+spark.conf.set("spark.sql.parquet.vorder.default", "true")           # V-Order on writes
+spark.conf.set("spark.microsoft.delta.optimizeWrite.enabled", "true")
+spark.conf.set("spark.sql.adaptive.enabled", "true")</code></pre>
+<p>The Lakehouse UI also offers <b>Table maintenance</b> (right-click a table → Maintenance) to run OPTIMIZE (with V-Order / Z-Order) and VACUUM without code.</p>
+</section>
+
+<!-- ============ WAREHOUSING ============ -->
+<section id="warehouse">
+<h2><span class="n">3</span>Fabric Warehouse (T-SQL)</h2>
+<p>The Warehouse is a fully transactional, scale-out relational warehouse with a T-SQL surface area. Data is stored as Delta/Parquet in OneLake; compute is serverless and separated from storage. Multi-table transactions and snapshot isolation are supported.</p>
+<pre data-lang="sql"><code>-- Create schema and table
+CREATE SCHEMA gold;
+GO
+CREATE TABLE gold.dim_customer (
+    customer_key  BIGINT        NOT NULL,
+    customer_id   INT           NOT NULL,
+    name          VARCHAR(100)  NULL,
+    city          VARCHAR(100)  NULL
+);                                              -- no IDENTITY in older builds; check current docs. Constraints are NOT ENFORCED
+
+-- Load: CTAS from a Lakehouse table in the same workspace (cross-database query)
+CREATE TABLE gold.fact_orders
+AS
+SELECT o.order_id, o.customer_id, CAST(o.order_date AS DATE) AS order_date, o.amount
+FROM   SalesLakehouse.dbo.silver_orders AS o       -- three-part name: item.schema.table
+WHERE  o.status = 'DONE';
+
+-- Bulk load files from storage
+COPY INTO gold.stage_orders
+FROM 'https://account.dfs.core.windows.net/container/orders/*.parquet'
+WITH (FILE_TYPE = 'PARQUET');
+
+-- Regular DML
+INSERT INTO gold.dim_customer (customer_key, customer_id, name, city)
+SELECT ROW_NUMBER() OVER (ORDER BY customer_id), customer_id, name, city FROM SalesLakehouse.dbo.silver_customers;
+
+UPDATE gold.dim_customer SET city = 'Mumbai' WHERE customer_id = 101;
+DELETE FROM gold.fact_orders WHERE order_date &lt; '2020-01-01';
+
+-- Views, stored procedures
+CREATE VIEW gold.v_monthly_sales AS
+SELECT DATETRUNC(month, order_date) AS month, SUM(amount) AS revenue
+FROM gold.fact_orders GROUP BY DATETRUNC(month, order_date);
+GO
+CREATE PROCEDURE gold.usp_refresh_fact_orders AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRAN;
+        TRUNCATE TABLE gold.fact_orders;
+        INSERT INTO gold.fact_orders SELECT order_id, customer_id, order_date, amount FROM SalesLakehouse.dbo.silver_orders;
+    COMMIT;
+END;</code></pre>
+<div class="callout tip"><b class="t">Warehouse features</b>
+<ul>
+<li><b>Cross-database queries</b> across Warehouses and Lakehouse SQL endpoints in the same workspace (three-part names).</li>
+<li><b>Zero-copy clone</b> (<code>CREATE TABLE … AS CLONE OF …</code>) and <b>time travel</b> (<code>OPTION (FOR TIMESTAMP AS OF …)</code>) via Delta metadata.</li>
+<li><b>Automatic statistics</b> and query insights views for monitoring; no manual indexing or distribution keys to manage.</li>
+<li>T-SQL support is a <b>subset</b> of SQL Server – some features (e.g. certain data types, triggers, cursors) are unavailable or differ; check the current surface-area documentation.</li>
+</ul></div>
+</section>
+
+<section id="lhvswh">
+<h2><span class="n">3.1</span>Lakehouse vs Warehouse – Which to Use?</h2>
+<table>
+<tr><th></th><th>Lakehouse</th><th>Warehouse</th></tr>
+<tr><td>Primary skill</td><td>Spark / Python / Scala (also T-SQL read)</td><td>T-SQL</td></tr>
+<tr><td>Data types</td><td>Structured, semi-structured, unstructured</td><td>Structured</td></tr>
+<tr><td>Write via T-SQL</td><td>No (SQL endpoint is read-only)</td><td>Yes – full DML/DDL</td></tr>
+<tr><td>Write via Spark</td><td>Yes</td><td>No direct (use pipelines/T-SQL; read via shortcut or Spark read of Delta)</td></tr>
+<tr><td>Transactions</td><td>Per Delta table</td><td>Multi-table ACID transactions</td></tr>
+<tr><td>Best for</td><td>Bronze/silver, ML, data engineering, raw files</td><td>Gold/serving layer, dimensional models, SQL-centric teams</td></tr>
+</table>
+<p>Common pattern: <b>Lakehouse for bronze/silver (Spark), Warehouse for gold (T-SQL)</b>, with Power BI Direct Lake on top. Both can be queried together through cross-database queries and are stored in OneLake as Delta.</p>
+</section>
+
+<!-- ============ INTEGRATION ============ -->
+<section id="pipelines">
+<h2><span class="n">4</span>Data Factory Pipelines</h2>
+<p>Pipelines orchestrate activities with control flow, parameters and dependencies – the same model as Azure Data Factory.</p>
+<table>
+<tr><th>Activity</th><th>Use</th></tr>
+<tr><td><b>Copy data</b></td><td>Move data between 100+ sources/sinks into Lakehouse/Warehouse files or tables</td></tr>
+<tr><td><b>Notebook</b> / Spark job definition</td><td>Run transformation code; pass parameters; read exit value</td></tr>
+<tr><td><b>Dataflow</b></td><td>Run a Dataflow Gen2</td></tr>
+<tr><td><b>Stored procedure / Script</b></td><td>Run T-SQL in a Warehouse or other SQL source</td></tr>
+<tr><td><b>Lookup / Get Metadata</b></td><td>Read config rows or file lists to drive logic</td></tr>
+<tr><td><b>ForEach / Until / If / Switch</b></td><td>Control flow (loop, condition)</td></tr>
+<tr><td><b>Web / Webhook / Invoke pipeline</b></td><td>Call APIs, chain pipelines</td></tr>
+<tr><td><b>Fail / Set variable / Wait</b></td><td>Utility</td></tr>
+<tr><td><b>Teams / Outlook / Office 365</b></td><td>Notifications on failure/success</td></tr>
+</table>
+<h3>Dynamic expressions</h3>
+<pre data-lang="text"><code>@pipeline().parameters.run_date                         pipeline parameter
+@pipeline().RunId   @pipeline().TriggerTime             system values
+@activity('LookupWatermark').output.firstRow.max_ts     output of a Lookup
+@item().table_name                                      current item inside ForEach
+@concat('Files/raw/', formatDateTime(utcNow(), 'yyyy/MM/dd'), '/')
+@if(equals(pipeline().parameters.full_load, true), 'full', 'delta')
+@activity('Copy1').output.rowsCopied</code></pre>
+<h3>Typical metadata-driven pattern</h3>
+<ol>
+<li><b>Lookup</b> reads a control table (source table, target table, load type, watermark column).</li>
+<li><b>ForEach</b> iterates over rows (set batch count for parallelism).</li>
+<li>Inside: <b>Copy data</b> with a parameterized query (<code>WHERE modified &gt; @{item().last_watermark}</code>) into the Lakehouse.</li>
+<li><b>Notebook</b> merges into silver; <b>Script</b> updates the watermark.</li>
+<li>On failure path: <b>Teams/Outlook</b> activity + log to an audit table.</li>
+</ol>
+<p><b>Triggers:</b> schedule trigger, tumbling-style via schedule parameters, <b>event triggers</b> (e.g. file arrival in OneLake/storage via Activator/Real-Time hub). Set <b>retry count / timeout</b> on each activity and use <i>On fail</i> / <i>On completion</i> dependency paths for error handling.</p>
+</section>
+
+<section id="dataflows">
+<h2><span class="n">4.1</span>Dataflows Gen2</h2>
+<ul>
+<li>Low-code <b>Power Query (M)</b> transformations with a visual editor; good for analysts and light-to-medium ETL.</li>
+<li>Each query can set a <b>data destination</b> (Lakehouse table, Warehouse, Azure SQL, etc.) with append/replace.</li>
+<li>Run on demand, on a schedule, or as a pipeline activity; supports <b>incremental refresh</b> for supported sources and <b>staging</b> via Lakehouse for performance.</li>
+<li>Use <b>Dataflows</b> for self-service and quick wins; use <b>Spark notebooks</b> for large volumes, complex logic, and code reuse/testing.</li>
+</ul>
+<pre data-lang="text"><code>let
+    Source   = Sql.Database("server.database.windows.net", "SalesDB"),
+    Orders   = Source{[Schema = "dbo", Item = "orders"]}[Data],
+    Filtered = Table.SelectRows(Orders, each [status] = "DONE"),
+    Typed    = Table.TransformColumnTypes(Filtered, {{"order_date", type date}, {"amount", type number}}),
+    Grouped  = Table.Group(Typed, {"customer_id"}, {{"revenue", each List.Sum([amount]), type number}})
+in
+    Grouped</code></pre>
+<table>
+<tr><th>Choose</th><th>When</th></tr>
+<tr><td>Pipeline (Copy)</td><td>Bulk movement, orchestration, many sources, minimal transformation</td></tr>
+<tr><td>Dataflow Gen2</td><td>Low-code shaping with Power Query, business-user friendly</td></tr>
+<tr><td>Notebook</td><td>Heavy transformation, big data, ML, reusable code, CI/CD</td></tr>
+</table>
+</section>
+
+<section id="incremental">
+<h2><span class="n">4.2</span>Incremental Load (Watermark) Pattern</h2>
+<pre data-lang="python"><code># Notebook: incremental load from bronze to silver using a watermark table
+from pyspark.sql import functions as F
+from delta.tables import DeltaTable
+
+wm_tbl = "ctl_watermark"
+last_wm = (spark.read.table(wm_tbl).filter("table_name = 'orders'")
+             .select("last_value").first()["last_value"])            # e.g. '2026-10-29 23:59:59'
+
+src = spark.read.table("bronze_orders").filter(F.col("modified_at") &gt; F.lit(last_wm))
+
+if src.limit(1).count() &gt; 0:
+    new_wm = src.agg(F.max("modified_at")).first()[0]
+
+    (DeltaTable.forName(spark, "silver_orders").alias("t")
+        .merge(src.dropDuplicates(["order_id"]).alias("s"), "t.order_id = s.order_id")
+        .whenMatchedUpdateAll().whenNotMatchedInsertAll().execute())
+
+    spark.sql(f"UPDATE {wm_tbl} SET last_value = '{new_wm}' WHERE table_name = 'orders'")   # advance only after success
+notebookutils.notebook.exit(f"rows={src.count()}")</code></pre>
+<div class="callout tip"><b class="t">Best practices</b>Advance the watermark <b>after</b> a successful merge, make loads idempotent (merge, not blind append), handle late data with an overlap window, and log run metadata (rows, duration, status) to an audit table.</div>
+</section>
+
+<!-- ============ REAL TIME & BI ============ -->
+<section id="rti">
+<h2><span class="n">5</span>Real-Time Intelligence &amp; KQL</h2>
+<div class="diagram">Sources (Event Hubs, Kafka, IoT, custom apps, CDC)
+        │
+   Eventstream  ──(transform/route)──►  Eventhouse (KQL database)  ──►  KQL Queryset / Real-Time Dashboard
+        │                                       │
+        └──────────────►  Lakehouse (Delta)     └──► Activator (alerts/actions) ──► Teams, Power Automate</div>
+<ul>
+<li><b>Eventstream:</b> no-code ingestion, filtering, enrichment and routing of streaming data to destinations.</li>
+<li><b>Eventhouse / KQL database:</b> optimized for time-series, logs and telemetry with fast ingestion and indexing; OneLake availability exposes data as Delta.</li>
+<li><b>Real-Time hub:</b> catalog of all streams/events in the tenant.</li>
+<li><b>Activator:</b> define conditions (e.g. temperature &gt; 80 for 5 min) and trigger emails, Teams messages or Power Automate flows.</li>
+</ul>
+<pre data-lang="kql"><code>// Kusto Query Language (KQL): pipe-based, read top to bottom
+Telemetry
+| where Timestamp &gt; ago(1h) and Temperature &gt; 70
+| summarize AvgTemp = avg(Temperature), Readings = count() by DeviceId, bin(Timestamp, 5m)
+| order by AvgTemp desc
+| take 20
+
+// Time chart
+Telemetry
+| where Timestamp &gt; ago(24h)
+| summarize avg(Temperature) by bin(Timestamp, 15m), Region
+| render timechart
+
+// Join and project
+Orders
+| join kind=inner (Customers) on CustomerId
+| project OrderId, Name, Amount
+| extend AmountBand = iff(Amount &gt; 1000, "High", "Normal")</code></pre>
+<table>
+<tr><th>SQL</th><th>KQL</th></tr>
+<tr><td><code>WHERE</code></td><td><code>| where</code></td></tr>
+<tr><td><code>SELECT</code></td><td><code>| project</code> / <code>| extend</code></td></tr>
+<tr><td><code>GROUP BY … SUM()</code></td><td><code>| summarize sum() by …</code></td></tr>
+<tr><td><code>ORDER BY</code> / <code>TOP</code></td><td><code>| order by</code> / <code>| take</code> / <code>| top</code></td></tr>
+<tr><td><code>JOIN</code></td><td><code>| join kind=… (table) on key</code></td></tr>
+</table>
+</section>
+
+<section id="pbi">
+<h2><span class="n">5.1</span>Power BI &amp; Direct Lake</h2>
+<table>
+<tr><th>Storage mode</th><th>How it works</th><th>Trade-off</th></tr>
+<tr><td><b>Import</b></td><td>Data copied into the semantic model (VertiPaq) on refresh</td><td>Fastest queries; data duplication; refresh needed</td></tr>
+<tr><td><b>DirectQuery</b></td><td>Queries sent to the source at query time</td><td>Always fresh; slower; load on source</td></tr>
+<tr><td><b>Direct Lake</b></td><td>Loads Delta/Parquet columns from OneLake straight into memory on demand – no import copy, no source query</td><td>Import-like speed with lake freshness; needs well-maintained Delta (V-Order, few files); may fall back to DirectQuery for unsupported scenarios</td></tr>
+</table>
+<ul>
+<li>Build a semantic model from Lakehouse/Warehouse tables, define relationships, measures (DAX), row-level security.</li>
+<li><b>Framing</b> (a metadata refresh of the model) points Direct Lake at the latest Delta version – automatic by default after tables update.</li>
+<li>Keep gold tables in star schema, avoid very many small files, and check for <b>fallback</b> in Performance Analyzer / DAX Studio.</li>
+</ul>
+<pre data-lang="text"><code>-- DAX measure examples
+Total Revenue = SUM ( fact_orders[amount] )
+Revenue YoY % =
+VAR Prev = CALCULATE ( [Total Revenue], SAMEPERIODLASTYEAR ( dim_date[date] ) )
+RETURN DIVIDE ( [Total Revenue] - Prev, Prev )</code></pre>
+</section>
+
+<!-- ============ ARCHITECTURE & OPS ============ -->
+<section id="medallion">
+<h2><span class="n">6</span>Medallion Architecture End-to-End</h2>
+<div class="diagram">Sources ──► Pipeline Copy / Mirroring / Shortcuts
+              │
+   BRONZE (Lakehouse)  raw, append-only, as-is   (Files/ + Delta)
+              │  Notebook: clean, dedupe, type-cast, conform
+   SILVER (Lakehouse)  validated, deduplicated Delta tables
+              │  Notebook / T-SQL: joins, aggregates, star schema
+   GOLD   (Warehouse or Lakehouse)  business-ready facts &amp; dimensions
+              │
+   Semantic model (Direct Lake) ──► Power BI reports / Copilot / Data Agents</div>
+<pre data-lang="python"><code># Bronze: ingest as-is with audit columns
+from pyspark.sql import functions as F
+bronze = (spark.read.option("header", True).csv("Files/landing/orders/")
+            .withColumn("_ingest_ts", F.current_timestamp())
+            .withColumn("_source_file", F.input_file_name()))
+bronze.write.format("delta").mode("append").saveAsTable("bronze.orders")
+
+# Silver: clean + conform + dedupe
+silver = (spark.read.table("bronze.orders")
+            .withColumn("order_date", F.to_date("order_date"))
+            .withColumn("amount", F.col("amount").cast("decimal(18,2)"))
+            .filter("order_id IS NOT NULL AND amount &gt;= 0")
+            .dropDuplicates(["order_id"]))
+silver.write.format("delta").mode("overwrite").saveAsTable("silver.orders")
+
+# Gold: aggregate for reporting
+gold = (spark.read.table("silver.orders").groupBy("order_date")
+          .agg(F.sum("amount").alias("revenue"), F.countDistinct("customer_id").alias("customers")))
+gold.write.format("delta").mode("overwrite").saveAsTable("gold.daily_sales")</code></pre>
+<div class="callout tip"><b class="t">Orchestration</b>One pipeline: Copy/Mirror → Notebook(bronze→silver) → Notebook or Warehouse procedure (silver→gold) → refresh semantic model → notify. Parameterize by environment and date.</div>
+</section>
+
+<section id="security">
+<h2><span class="n">6.1</span>Security &amp; Governance</h2>
+<table>
+<tr><th>Layer</th><th>Mechanism</th></tr>
+<tr><td>Tenant / capacity</td><td>Entra ID authentication, Conditional Access, tenant admin settings, private links / managed private endpoints</td></tr>
+<tr><td>Workspace</td><td>Roles: Admin, Member, Contributor, Viewer</td></tr>
+<tr><td>Item</td><td>Share individual items with specific permissions (e.g. Read, ReadData, ReadAll, Build)</td></tr>
+<tr><td>Data (SQL)</td><td>T-SQL <code>GRANT/DENY</code>, <b>Row-level security</b>, <b>Column-level security</b>, <b>Dynamic data masking</b></td></tr>
+<tr><td>Data (OneLake)</td><td>OneLake data access roles (folder/table-level security on Lakehouse data)</td></tr>
+<tr><td>Power BI</td><td>RLS / OLS on semantic models, sensitivity labels</td></tr>
+<tr><td>Governance</td><td><b>Microsoft Purview</b>: sensitivity labels, lineage, endorsement (Promoted/Certified), data catalog, audit logs</td></tr>
+<tr><td>Secrets</td><td>Azure Key Vault via <code>notebookutils.credentials</code> / connections; avoid hard-coded keys</td></tr>
+</table>
+<pre data-lang="sql"><code>-- Row-level security in a Warehouse
+CREATE FUNCTION security.fn_region_filter(@Region AS VARCHAR(50))
+RETURNS TABLE WITH SCHEMABINDING AS
+RETURN SELECT 1 AS allowed WHERE @Region = USER_NAME() OR USER_NAME() = 'admin@contoso.com';
+GO
+CREATE SECURITY POLICY security.RegionPolicy
+ADD FILTER PREDICATE security.fn_region_filter(region) ON gold.fact_orders
+WITH (STATE = ON);
+
+-- Column-level and dynamic masking
+GRANT SELECT ON gold.dim_customer (customer_id, city) TO [analyst@contoso.com];
+ALTER TABLE gold.dim_customer ALTER COLUMN email ADD MASKED WITH (FUNCTION = 'email()');</code></pre>
+</section>
+
+<section id="alm">
+<h2><span class="n">6.2</span>Git, CI/CD &amp; Monitoring</h2>
+<ul>
+<li><b>Git integration:</b> connect a workspace to Azure DevOps or GitHub; commit/pull items (notebooks, pipelines, semantic models, reports, etc.), use branches per feature. Supported item types grow over time – check current list.</li>
+<li><b>Deployment pipelines:</b> Dev → Test → Prod stages with rules (e.g. swap data source/lakehouse per stage); compare and promote content.</li>
+<li><b>Automation:</b> Fabric REST APIs and Azure DevOps/GitHub Actions; the <code>fabric-cicd</code> Python library can deploy items from Git.</li>
+<li><b>Monitoring hub:</b> central view of runs (pipelines, notebooks, Spark jobs, dataflows, refreshes) with status, duration, logs; Spark History Server &amp; Spark UI for job-level diagnosis; <b>Capacity Metrics app</b> for CU consumption.</li>
+<li><b>Alerting:</b> failure notification activities in pipelines, Activator rules, Azure Monitor / Log Analytics integration for diagnostics.</li>
+</ul>
+<div class="callout tip"><b class="t">Environment practice</b>Use variables/parameters (or <b>variable libraries</b>) for workspace/lakehouse IDs and connection names so the same notebook or pipeline works unchanged in Dev, Test and Prod.</div>
+</section>
+
+<section id="tuning">
+<h2><span class="n">6.3</span>Performance &amp; Cost Tuning</h2>
+<table>
+<tr><th>Area</th><th>What to do</th></tr>
+<tr><td>Storage</td><td>Delta everywhere; compact small files (OPTIMIZE / table maintenance); V-Order for read-heavy gold tables; sensible partitioning (low-cardinality, large tables only); VACUUM</td></tr>
+<tr><td>Spark</td><td>Starter pools + high concurrency; right-size nodes; AQE on; broadcast small dimensions; avoid wide shuffles and Python UDFs; Native Execution Engine</td></tr>
+<tr><td>Warehouse</td><td>Use CTAS for heavy transformations; avoid row-by-row logic; keep statistics fresh; filter early; use Query Insights to find slow queries</td></tr>
+<tr><td>Power BI</td><td>Star schema, Direct Lake, avoid fallback, reduce high-cardinality columns, aggregations</td></tr>
+<tr><td>Capacity / cost</td><td>Monitor with Capacity Metrics; schedule heavy jobs off-peak; pause dev capacities; split workloads across capacities; avoid long idle interactive sessions (stop Spark sessions)</td></tr>
+</table>
+</section>
+
+<!-- ============ INTERVIEW ============ -->
+<section id="qa">
+<h2><span class="n">7</span>Interview Questions &amp; Answers</h2>
+<div class="toolbar"><button class="toggle" type="button" onclick="document.querySelectorAll('#qa details').forEach(d=>d.open=true)">Expand all</button><button class="toggle" type="button" onclick="document.querySelectorAll('#qa details').forEach(d=>d.open=false)">Collapse all</button></div>
+
+<details><summary>What is Microsoft Fabric and how is it different from Azure Synapse?</summary><div class="ans">Fabric is a unified SaaS analytics platform (data integration, engineering, warehousing, real-time, science and Power BI) on one storage layer, OneLake, with capacity-based billing. Synapse is a PaaS collection of separate services (dedicated/serverless SQL pools, Spark pools, pipelines) you provision and manage individually. Fabric removes most infrastructure setup and shares data across workloads without copies.</div></details>
+
+<details><summary>What is OneLake?</summary><div class="ans">The single, tenant-wide logical data lake built on ADLS Gen2 that stores all Fabric data in open Delta/Parquet format. It's organized by workspace and item, exposes an ADLS-compatible API, and avoids data silos and duplication.</div></details>
+
+<details><summary>What are shortcuts and when would you use them?</summary><div class="ans">Pointers to data in other Fabric items or external storage (ADLS Gen2, S3, GCS, Dataverse…) that appear as folders/tables in a Lakehouse without copying data. Use them to reuse shared datasets across workspaces, to access data in place, and to avoid duplicate pipelines.</div></details>
+
+<details><summary>What is mirroring?</summary><div class="ans">Continuous, near-real-time replication of an operational database (e.g. Azure SQL, Cosmos DB, Snowflake) into OneLake as Delta tables, requiring no ETL pipelines. It enables analytics on operational data with minimal latency.</div></details>
+
+<details><summary>Lakehouse vs Warehouse – when do you choose each?</summary><div class="ans">Lakehouse: Spark/Python skills, mixed structured and unstructured data, bronze/silver layers, ML. Warehouse: T-SQL skills, full DML/DDL, multi-table transactions, gold/serving layer and dimensional models. Both store Delta in OneLake and can be queried together via cross-database queries.</div></details>
+
+<details><summary>What is the SQL analytics endpoint?</summary><div class="ans">An automatically created, read-only T-SQL endpoint over a Lakehouse's Delta tables. You can run SELECT queries and create views/functions/procedures, but can't INSERT/UPDATE tables – writes happen via Spark or pipelines.</div></details>
+
+<details><summary>What is Direct Lake?</summary><div class="ans">A Power BI storage mode where the semantic model reads Delta/Parquet files directly from OneLake into memory on demand – import-like performance without a data copy and without querying a source at runtime. It requires well-maintained Delta tables; unsupported scenarios can fall back to DirectQuery.</div></details>
+
+<details><summary>Explain Fabric capacity, bursting, smoothing and throttling.</summary><div class="ans">Capacity is the pool of compute (CUs) bought as an F SKU shared by all workloads. Bursting lets jobs temporarily use more than the purchased CUs; smoothing spreads that consumption over time (longer for background jobs). If sustained usage exceeds capacity, Fabric throttles – first delaying, then rejecting operations. Monitor with the Capacity Metrics app.</div></details>
+
+<details><summary>What is V-Order?</summary><div class="ans">A write-time optimization of Parquet files (special sorting, row-group distribution, dictionary encoding and compression) that improves read performance for Fabric engines – notably Power BI Direct Lake, the SQL endpoint and Spark. It can add a little write overhead, so use it mainly for read-heavy layers.</div></details>
+
+<details><summary>How do you implement incremental loading in Fabric?</summary><div class="ans">Use a watermark (last modified timestamp or ID) stored in a control table. A pipeline Lookup reads it, Copy data or a notebook extracts only newer rows, a Delta <code>MERGE</code> upserts them idempotently into silver, and the watermark is advanced after success. Alternatives: mirroring, Dataflow Gen2 incremental refresh, Delta Change Data Feed for downstream propagation.</div></details>
+
+<details><summary>Pipelines vs Dataflows Gen2 vs Notebooks?</summary><div class="ans">Pipelines orchestrate and copy data at scale. Dataflows Gen2 provide low-code Power Query transformations for analysts. Notebooks give full code control (Spark) for heavy, complex, testable transformations. They are often combined: a pipeline orchestrates notebooks and dataflows.</div></details>
+
+<details><summary>How do you pass parameters between a pipeline and a notebook?</summary><div class="ans">Mark a cell as the parameter cell in the notebook; the pipeline's Notebook activity supplies base parameters that override those values. The notebook returns a value with <code>notebookutils.notebook.exit()</code>, which the pipeline reads from <code>@activity('Notebook1').output.result.exitValue</code>.</div></details>
+
+<details><summary>How do you secure data in Fabric?</summary><div class="ans">Layered: Entra ID and Conditional Access, workspace roles, item-level permissions, SQL GRANT/DENY with row-level and column-level security and dynamic masking, OneLake data access roles, RLS/OLS in semantic models, sensitivity labels and lineage via Purview, secrets in Key Vault, and private links for network isolation.</div></details>
+
+<details><summary>How would you implement CI/CD in Fabric?</summary><div class="ans">Connect workspaces to Git (Azure DevOps/GitHub) for version control and branching, use deployment pipelines (Dev→Test→Prod) with deployment rules for environment-specific settings, and automate with REST APIs, GitHub Actions/Azure DevOps and the fabric-cicd library. Parameterize workspace/lakehouse references.</div></details>
+
+<details><summary>How do you handle the small-files problem?</summary><div class="ans">Enable Optimize Write, run <code>OPTIMIZE</code> (with V-Order as needed) on a schedule or via Lakehouse table maintenance, avoid over-partitioning, batch streaming writes with larger triggers, and <code>VACUUM</code> old files after the retention period.</div></details>
+
+<details><summary>What is Real-Time Intelligence?</summary><div class="ans">The Fabric workload for streaming and event-driven analytics: Eventstreams ingest and route events, Eventhouses (KQL databases) store and query time-series data fast with KQL, Real-Time Dashboards visualize it, and Activator triggers actions on conditions.</div></details>
+
+<details><summary>How do you design a medallion architecture in Fabric?</summary><div class="ans">Bronze Lakehouse for raw append-only ingestion (via pipelines, mirroring, shortcuts); silver Lakehouse for cleaned, deduplicated, conformed Delta tables built by notebooks; gold Warehouse or Lakehouse with star-schema facts/dimensions; Direct Lake semantic model on top. Orchestrate with pipelines, separate workspaces per layer/environment, and secure per layer.</div></details>
+
+<details><summary>How do you upsert data in Fabric?</summary><div class="ans">In Spark notebooks use Delta <code>MERGE</code> (<code>DeltaTable.merge</code> or SQL <code>MERGE INTO</code>) after deduplicating the source. In a Warehouse use T-SQL DML (INSERT/UPDATE/DELETE, or MERGE where supported) inside a transaction. For SCD2, close the current row and insert a new version using a staged merge.</div></details>
+
+<details><summary>What is a Fabric Environment?</summary><div class="ans">A reusable configuration item bundling Spark runtime version, compute settings, libraries (public/custom wheels) and Spark properties that can be attached to notebooks and Spark job definitions to ensure consistency across teams and stages.</div></details>
+
+<details><summary>How do you monitor and troubleshoot failures?</summary><div class="ans">Use the Monitoring hub for run status and history, drill into the Spark UI / History Server and driver/executor logs for notebook failures, check pipeline activity input/output in run details, review Capacity Metrics for throttling, and add alerts (Teams/Outlook activities, Activator, Azure Monitor).</div></details>
+
+<details><summary>Can Spark write to a Fabric Warehouse?</summary><div class="ans">Not directly as a standard Spark table sink – Warehouse tables are managed through T-SQL (and pipelines/dataflows/COPY INTO). Spark can read Warehouse Delta data and Lakehouse tables can be exposed to the Warehouse via cross-database queries or shortcuts; a Spark connector for Warehouse reads/writes also exists in newer runtimes – verify current support.</div></details>
+</section>
+
+<section id="cheat">
+<h2><span class="n">A</span>Cheat Sheet &amp; Platform Comparison</h2>
+<table>
+<tr><th>Need</th><th>Fabric tool</th></tr>
+<tr><td>Land raw files</td><td>Lakehouse <code>Files/</code> via pipeline Copy / shortcut</td></tr>
+<tr><td>Replicate an operational DB</td><td>Mirroring</td></tr>
+<tr><td>Reference external data without copying</td><td>Shortcut</td></tr>
+<tr><td>Heavy transformation</td><td>Spark notebook (PySpark / Spark SQL)</td></tr>
+<tr><td>Low-code transformation</td><td>Dataflow Gen2</td></tr>
+<tr><td>SQL warehouse with DML</td><td>Warehouse</td></tr>
+<tr><td>Streaming / telemetry</td><td>Eventstream + Eventhouse (KQL)</td></tr>
+<tr><td>Alerts on data conditions</td><td>Activator</td></tr>
+<tr><td>BI on lake data</td><td>Semantic model with Direct Lake</td></tr>
+<tr><td>Orchestrate end-to-end</td><td>Data pipeline</td></tr>
+<tr><td>Promote Dev → Prod</td><td>Git + deployment pipelines</td></tr>
+</table>
+<table>
+<tr><th></th><th>Microsoft Fabric</th><th>Azure Synapse</th><th>Databricks</th></tr>
+<tr><td>Model</td><td>SaaS, capacity-based</td><td>PaaS, per-service</td><td>PaaS lakehouse platform (multi-cloud)</td></tr>
+<tr><td>Storage</td><td>OneLake (Delta)</td><td>ADLS Gen2 / dedicated pool</td><td>Cloud object storage + Unity Catalog</td></tr>
+<tr><td>BI</td><td>Built-in Power BI, Direct Lake</td><td>Power BI separate</td><td>Dashboards, connect Power BI</td></tr>
+<tr><td>Strength</td><td>Unified experience, low setup, Microsoft ecosystem</td><td>Existing SQL pool workloads</td><td>Advanced Spark/ML, governance, multi-cloud</td></tr>
+</table>
+<h3>Study checklist</h3>
+<ul>
+<li>✅ Explain OneLake, workspaces, capacity and the item types.</li>
+<li>✅ Build a bronze → silver → gold flow with a pipeline, notebooks and a Warehouse/Lakehouse gold layer.</li>
+<li>✅ Write incremental loads with watermark + Delta MERGE.</li>
+<li>✅ Know Lakehouse vs Warehouse, shortcut vs mirroring, Import vs DirectQuery vs Direct Lake.</li>
+<li>✅ Know security layers (RLS/CLS, OneLake roles, Purview) and CI/CD (Git + deployment pipelines).</li>
+<li>✅ Practice OPTIMIZE / V-Order / VACUUM and capacity monitoring.</li>
+</ul>
+</section>
+
+</main>
+</div>
+<footer>Microsoft Fabric Study Guide · Feature names, limits and previews change frequently – confirm against Microsoft Learn.</footer>
+
+<script>
+(function(){
+  var root=document.documentElement,btn=document.getElementById('themeBtn');
+  try{var s=localStorage.getItem('theme');if(s)root.setAttribute('data-theme',s);
+      else if(window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)root.setAttribute('data-theme','light');}catch(e){}
+  btn.addEventListener('click',function(){
+    var n=root.getAttribute('data-theme')==='dark'?'light':'dark';
+    root.setAttribute('data-theme',n);try{localStorage.setItem('theme',n)}catch(e){}
+  });
+})();
+
+/* Lightweight highlighter: python, sql, kql; others left plain */
+(function(){
+  function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+  var PY='and|as|assert|class|continue|def|elif|else|except|finally|for|from|if|import|in|is|lambda|None|not|or|pass|return|True|False|try|while|with|yield';
+  var SQ='SELECT|DISTINCT|FROM|WHERE|GROUP|BY|ORDER|HAVING|JOIN|INNER|LEFT|RIGHT|FULL|ON|AS|WITH|OVER|PARTITION|AND|OR|NOT|IN|IS|NULL|CASE|WHEN|THEN|ELSE|END|UNION|ALL|INSERT|INTO|VALUES|UPDATE|SET|DELETE|MERGE|CREATE|ALTER|DROP|TRUNCATE|TABLE|VIEW|SCHEMA|INDEX|FUNCTION|PROCEDURE|BEGIN|COMMIT|TRAN|GO|DECLARE|RETURNS|RETURN|OPTIMIZE|ZORDER|VORDER|VACUUM|RETAIN|HOURS|DESCRIBE|HISTORY|VERSION|OF|RESTORE|TO|COPY|CLONE|ADD|FILTER|PREDICATE|POLICY|SECURITY|STATE|ON|GRANT|DENY|MASKED|COLUMN|WITH|SCHEMABINDING|TIMESTAMP|FOR|ASC|DESC|TRUE|FALSE|INT|BIGINT|VARCHAR|DATE|DECIMAL';
+  var KQ='where|summarize|project|extend|order|by|take|top|join|kind|inner|on|render|ago|bin|iff|count|avg|sum|timechart|let';
+  var reP=new RegExp("(#.*)|(\"\"\"[\\s\\S]*?\"\"\"|f?\"(?:\\\\.|[^\"\\\\\\n])*\"|f?'(?:\\\\.|[^'\\\\\\n])*')|\\b("+PY+")\\b|\\b(\\d[\\d_]*\\.?\\d*)\\b|\\b([A-Za-z_]\\w*)(?=\\()",'g');
+  var reS=new RegExp("(--.*)|('(?:[^']|'')*')|\\b("+SQ+")\\b|\\b(\\d+(?:\\.\\d+)?)\\b|\\b([A-Za-z_]\\w*)(?=\\()",'gi');
+  var reK=new RegExp("(\\/\\/.*)|(\"(?:[^\"])*\"|'[^']*')|\\b("+KQ+")\\b|\\b(\\d+[a-z]?)\\b|(\\|)",'g');
+  function run(code,re,map){
+    var out='',last=0,m;re.lastIndex=0;
+    while((m=re.exec(code))){
+      out+=esc(code.slice(last,m.index));
+      out+='<span class="'+map(m)+'">'+esc(m[0])+'</span>';last=m.index+m[0].length;
+    }
+    return out+esc(code.slice(last));
+  }
+  function hl(code,lang){
+    if(lang==='python')return run(code,reP,function(m){return m[1]?'c':m[2]?'s':m[3]?'k':m[4]?'m':'f'});
+    if(lang==='sql')return run(code,reS,function(m){return m[1]?'c':m[2]?'s':m[3]?'k':m[4]?'m':'f'});
+    if(lang==='kql')return run(code,reK,function(m){return m[1]?'c':m[2]?'s':m[3]?'k':m[4]?'m':'d'});
+    return esc(code);
+  }
+  document.querySelectorAll('pre').forEach(function(pre){
+    var c=pre.querySelector('code');if(!c)return;
+    var raw=c.textContent;c.innerHTML=hl(raw,pre.getAttribute('data-lang'));
+    var b=document.createElement('button');b.className='copy';b.type='button';b.textContent='Copy';
+    b.addEventListener('click',function(){
+      var done=function(){b.textContent='Copied!';setTimeout(function(){b.textContent='Copy'},1200)};
+      if(navigator.clipboard)navigator.clipboard.writeText(raw).then(done,done);
+    });
+    pre.appendChild(b);
+  });
+})();
+
+(function(){
+  var links=[].slice.call(document.querySelectorAll('#toc a'));
+  var map={};links.forEach(function(a){map[a.getAttribute('href').slice(1)]=a});
+  if(!('IntersectionObserver' in window))return;
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting){links.forEach(function(a){a.classList.remove('active')});
+        var a=map[e.target.id];if(a)a.classList.add('active');}
+    });
+  },{rootMargin:'-20% 0px -70% 0px'});
+  document.querySelectorAll('main section').forEach(function(s){io.observe(s)});
+})();
+</script>
+</body>
+</html>
