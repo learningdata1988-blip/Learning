@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PySpark Study Guide &amp; Reference</title>
+<style>
+:root{
+  --bg:#0f172a;--panel:#1e293b;--panel2:#162033;--text:#e2e8f0;--muted:#94a3b8;--border:#334155;
+  --accent:#38bdf8;--accent2:#818cf8;--code-bg:#0b1220;--warn:#f59e0b;--ok:#34d399;
+  --t-kw:#c084fc;--t-str:#86efac;--t-com:#64748b;--t-num:#fbbf24;--t-fn:#38bdf8;--t-cls:#f9a8d4;--t-dec:#fb923c;
+}
+[data-theme="light"]{
+  --bg:#f8fafc;--panel:#ffffff;--panel2:#f1f5f9;--text:#0f172a;--muted:#475569;--border:#cbd5e1;
+  --accent:#0369a1;--accent2:#4f46e5;--code-bg:#f1f5f9;--warn:#b45309;--ok:#047857;
+  --t-kw:#7e22ce;--t-str:#15803d;--t-com:#64748b;--t-num:#b45309;--t-fn:#0369a1;--t-cls:#be185d;--t-dec:#c2410c;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.65 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 24px;background:var(--panel);border-bottom:1px solid var(--border)}
+header h1{font-size:1.1rem;margin:0}
+header h1 span{color:var(--accent)}
+button.toggle{background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit;font-size:.85rem}
+.layout{display:grid;grid-template-columns:260px minmax(0,1fr);max-width:1300px;margin:0 auto;gap:32px;padding:24px}
+nav{position:sticky;top:76px;align-self:start;max-height:calc(100vh - 100px);overflow:auto;font-size:.9rem;padding-right:8px}
+nav a{display:block;color:var(--muted);text-decoration:none;padding:4px 10px;border-left:2px solid var(--border)}
+nav a:hover,nav a.active{color:var(--accent);border-left-color:var(--accent)}
+nav a.sub{padding-left:24px;font-size:.85rem}
+nav .mod{margin-top:12px;font-weight:600;color:var(--text);padding:4px 10px;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em}
+main{min-width:0;max-width:900px}
+section{margin-bottom:56px}
+h2{font-size:1.7rem;margin:0 0 6px;padding-bottom:8px;border-bottom:2px solid var(--accent)}
+h2 .n{color:var(--accent2);margin-right:8px}
+h3{font-size:1.2rem;margin:32px 0 8px;color:var(--accent)}
+p,li{color:var(--text)}
+ul{padding-left:22px}
+code{font-family:"JetBrains Mono","Fira Code",Consolas,monospace;font-size:.88em;background:var(--panel2);border:1px solid var(--border);padding:1px 6px;border-radius:5px}
+pre{position:relative;background:var(--code-bg);border:1px solid var(--border);border-radius:10px;padding:16px;overflow:auto;margin:12px 0 18px}
+pre code{background:none;border:0;padding:0;font-size:.85rem;line-height:1.55;display:block;white-space:pre}
+pre[data-lang]::before{content:attr(data-lang);position:absolute;top:6px;right:60px;font-size:.7rem;text-transform:uppercase;color:var(--muted);letter-spacing:.06em}
+.copy{position:absolute;top:5px;right:8px;background:var(--panel2);color:var(--muted);border:1px solid var(--border);border-radius:6px;font-size:.7rem;padding:2px 8px;cursor:pointer}
+.k{color:var(--t-kw)}.s{color:var(--t-str)}.c{color:var(--t-com);font-style:italic}.m{color:var(--t-num)}.f{color:var(--t-fn)}.cl{color:var(--t-cls)}.d{color:var(--t-dec)}
+table{width:100%;border-collapse:collapse;margin:12px 0 20px;font-size:.92rem;display:block;overflow-x:auto}
+th,td{border:1px solid var(--border);padding:8px 12px;text-align:left;vertical-align:top}
+th{background:var(--panel2);color:var(--accent)}
+.callout{border-left:4px solid var(--accent);background:var(--panel);padding:10px 16px;border-radius:0 8px 8px 0;margin:14px 0}
+.callout.warn{border-color:var(--warn)}.callout.tip{border-color:var(--ok)}
+.callout b.t{display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.diagram{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px;font-family:Consolas,monospace;font-size:.82rem;overflow:auto;white-space:pre;color:var(--muted)}
+footer{text-align:center;color:var(--muted);padding:24px;font-size:.85rem;border-top:1px solid var(--border)}
+@media(max-width:900px){.layout{grid-template-columns:1fr;padding:16px}nav{position:static;max-height:none;border-bottom:1px solid var(--border);padding-bottom:12px}}
+</style>
+</head>
+<body>
+<header>
+  <h1><span>⚡</span> PySpark Study Guide &amp; Reference</h1>
+  <button class="toggle" id="themeBtn" type="button">Toggle light/dark</button>
+</header>
+<div class="layout">
+<nav id="toc">
+  <div class="mod">1 · Architecture</div>
+  <a href="#arch" class="sub">Components</a>
+  <a href="#session" class="sub">SparkSession</a>
+  <a href="#lazy" class="sub">Lazy eval &amp; DAG</a>
+  <div class="mod">2 · DataFrame API</div>
+  <a href="#io" class="sub">Read / Write</a>
+  <a href="#cols" class="sub">Columns &amp; filters</a>
+  <a href="#joins" class="sub">Joins</a>
+  <a href="#agg" class="sub">Aggregations</a>
+  <div class="mod">3 · Advanced</div>
+  <a href="#window" class="sub">Window functions</a>
+  <a href="#clean" class="sub">Nulls &amp; dedup</a>
+  <div class="mod">4 · Performance</div>
+  <a href="#partitions" class="sub">Partitions &amp; shuffle</a>
+  <a href="#cache" class="sub">Caching</a>
+  <a href="#bottlenecks" class="sub">Skew, UDFs</a>
+  <div class="mod">5 · SQL &amp; Pandas</div>
+  <a href="#sql" class="sub">Spark SQL</a>
+  <a href="#pandas" class="sub">Pandas / Arrow</a>
+  <div class="mod">6 · Everyday Functions</div>
+  <a href="#strdate" class="sub">String &amp; date functions</a>
+  <a href="#complex" class="sub">Complex types / JSON</a>
+  <a href="#setops" class="sub">Set operations</a>
+  <a href="#schema" class="sub">Casting &amp; schema</a>
+  <div class="mod">7 · Delta, Upsert &amp; SCD</div>
+  <a href="#upsert" class="sub">Upsert (MERGE)</a>
+  <a href="#scd1" class="sub">SCD Type 1</a>
+  <a href="#scd2" class="sub">SCD Type 2</a>
+  <a href="#deltamaint" class="sub">Delta maintenance</a>
+  <a href="#dbwrite" class="sub">Write to Delta table &amp; Volume</a>
+  <div class="mod">8 · Streaming</div>
+  <a href="#streaming" class="sub">Structured Streaming</a>
+  <div class="mod">9 · Quality &amp; Debugging</div>
+  <a href="#testing" class="sub">Testing &amp; structure</a>
+  <a href="#dq" class="sub">Data quality checks</a>
+  <a href="#debug" class="sub">Debugging errors</a>
+  <div class="mod">Appendix</div>
+  <a href="#cheat" class="sub">Cheat sheet</a>
+</nav>
+<main>
+
+<!-- ============ MODULE 1 ============ -->
+<section id="arch">
+<h2><span class="n">1</span>PySpark Architecture &amp; Distributed Computing</h2>
+<h3>Core components</h3>
+<table>
+<tr><th>Component</th><th>Role</th></tr>
+<tr><td><b>Driver</b></td><td>Runs your <code>main()</code>, holds the <code>SparkSession</code>, builds the logical plan/DAG, schedules tasks, and collects results. Driver memory is the limit for <code>collect()</code>/<code>toPandas()</code>.</td></tr>
+<tr><td><b>Cluster Manager</b></td><td>Allocates resources: <b>Standalone</b>, <b>YARN</b>, <b>Kubernetes</b> (Mesos is deprecated). On Databricks/EMR/Dataproc it is managed for you.</td></tr>
+<tr><td><b>Worker Node</b></td><td>Machine hosting one or more <b>executors</b>.</td></tr>
+<tr><td><b>Executor</b></td><td>JVM process that runs tasks and stores cached data. Each executor has N cores = N parallel tasks.</td></tr>
+<tr><td><b>Job / Stage / Task</b></td><td>Action → <i>job</i>; shuffle boundary splits job into <i>stages</i>; each stage has one <i>task</i> per partition.</td></tr>
+</table>
+<div class="diagram">            ┌──────────────────────┐
+            │ Driver (SparkSession)│  builds DAG, schedules tasks
+            └──────────┬───────────┘
+                       │ requests resources
+            ┌──────────▼───────────┐
+            │ Cluster Manager      │  YARN / K8s / Standalone
+            └──────────┬───────────┘
+        ┌──────────────┼──────────────┐
+ ┌──────▼─────┐ ┌──────▼─────┐ ┌──────▼─────┐
+ │ Executor 1 │ │ Executor 2 │ │ Executor N │  tasks + cache
+ └────────────┘ └────────────┘ └────────────┘</div>
+<div class="callout"><b class="t">Deploy modes</b>In <code>client</code> mode the driver runs on the submitting machine (notebooks, debugging). In <code>cluster</code> mode the driver runs inside the cluster (production batch jobs).</div>
+<pre data-lang="bash"><code># Production submit on YARN
+spark-submit \
+  --master yarn --deploy-mode cluster \
+  --num-executors 10 --executor-cores 4 --executor-memory 8g \
+  --driver-memory 4g \
+  --conf spark.sql.shuffle.partitions=400 \
+  etl_job.py --date 2026-10-30</code></pre>
+</section>
+
+<section id="session">
+<h2><span class="n">1.1</span>SparkSession Initialization &amp; Config</h2>
+<pre data-lang="python"><code>from pyspark.sql import SparkSession
+
+spark = (
+    SparkSession.builder
+    .appName("orders-etl")
+    .config("spark.sql.shuffle.partitions", "200")        # tune to data size
+    .config("spark.sql.adaptive.enabled", "true")         # AQE (default in 3.2+)
+    .config("spark.sql.adaptive.skewJoin.enabled", "true")
+    .config("spark.sql.sources.partitionOverwriteMode", "dynamic")
+    .config("spark.sql.session.timeZone", "UTC")
+    .getOrCreate()
+)
+
+spark.sparkContext.setLogLevel("WARN")
+spark.conf.set("spark.sql.autoBroadcastJoinThreshold", 50 * 1024 * 1024)  # 50 MB</code></pre>
+<h3>Best practices</h3>
+<ul>
+<li>Set <b>cluster-level</b> settings (executor memory/cores, dynamic allocation) at submit time; <b>SQL</b> settings can change at runtime with <code>spark.conf.set</code>.</li>
+<li>Always use <code>getOrCreate()</code>; avoid multiple sessions unless isolating temp views via <code>spark.newSession()</code>.</li>
+<li>Pin timezone to UTC to avoid silent timestamp shifts between environments.</li>
+<li>Keep config out of code: pass via <code>--conf</code> or environment-specific files.</li>
+<li>Always <code>spark.stop()</code> in standalone scripts (not needed on Databricks).</li>
+</ul>
+</section>
+
+<section id="lazy">
+<h2><span class="n">1.2</span>Lazy Evaluation, Transformations &amp; Actions</h2>
+<p>Transformations only build a plan. Nothing runs until an <b>action</b> is called, which lets Spark optimize the whole pipeline.</p>
+<table>
+<tr><th>Type</th><th>Examples</th><th>Shuffle?</th></tr>
+<tr><td><b>Narrow</b></td><td><code>select</code>, <code>filter</code>, <code>withColumn</code>, <code>map</code>, <code>union</code>, <code>coalesce</code></td><td>No – each output partition depends on one input partition; pipelined in one stage</td></tr>
+<tr><td><b>Wide</b></td><td><code>groupBy</code>, <code>join</code>, <code>distinct</code>, <code>orderBy</code>, <code>repartition</code>, window with <code>partitionBy</code></td><td>Yes – data moves across the network; new stage</td></tr>
+<tr><td><b>Action</b></td><td><code>count</code>, <code>collect</code>, <code>show</code>, <code>take</code>, <code>write.*</code>, <code>foreach</code></td><td>Triggers a job</td></tr>
+</table>
+<h3>Catalyst Optimizer pipeline</h3>
+<ol>
+<li><b>Analysis</b> – resolve columns/tables against the catalog.</li>
+<li><b>Logical optimization</b> – predicate pushdown, column pruning, constant folding, join reordering.</li>
+<li><b>Physical planning</b> – choose strategies (broadcast vs. sort-merge), cost-based.</li>
+<li><b>Code generation</b> – Tungsten whole-stage codegen produces JVM bytecode.</li>
+</ol>
+<pre data-lang="python"><code>df = (spark.read.parquet("/data/orders")
+        .filter("order_date >= '2026-01-01'")   # pushed down to Parquet scan
+        .select("order_id", "customer_id", "amount"))
+
+df.explain(mode="formatted")   # physical plan; also "extended", "cost", "codegen"
+df.count()                     # action: only now does work happen</code></pre>
+<div class="callout tip"><b class="t">Tip</b>Read the plan bottom-up. Look for <code>PushedFilters</code>, <code>BroadcastHashJoin</code> vs <code>SortMergeJoin</code>, and <code>Exchange</code> nodes (each is a shuffle).</div>
+</section>
+
+<!-- ============ MODULE 2 ============ -->
+<section id="io">
+<h2><span class="n">2</span>DataFrame API: Reading &amp; Writing</h2>
+<p><b>Always define schemas explicitly</b> in production. <code>inferSchema</code> costs an extra pass and can drift between runs.</p>
+<pre data-lang="python"><code>from pyspark.sql.types import (StructType, StructField, StringType,
+                               IntegerType, DoubleType, TimestampType)
+
+schema = StructType([
+    StructField("order_id",    StringType(),    False),
+    StructField("customer_id", IntegerType(),   True),
+    StructField("amount",      DoubleType(),    True),
+    StructField("created_at",  TimestampType(), True),
+])
+
+# CSV
+csv_df = (spark.read.schema(schema)
+          .option("header", True)
+          .option("mode", "PERMISSIVE")        # or DROPMALFORMED / FAILFAST
+          .option("columnNameOfCorruptRecord", "_bad")
+          .csv("/landing/orders/*.csv"))
+
+# JSON (use multiLine for pretty-printed files)
+json_df = spark.read.schema(schema).option("multiLine", True).json("/landing/events/")
+
+# Parquet (schema embedded; mergeSchema if files differ)
+pq_df = spark.read.option("mergeSchema", True).parquet("/lake/orders")
+
+# Delta
+delta_df = spark.read.format("delta").load("/lake/delta/orders")
+old_df   = spark.read.format("delta").option("versionAsOf", 12).load("/lake/delta/orders")</code></pre>
+<h3>Writing</h3>
+<pre data-lang="python"><code>(df.write
+   .mode("overwrite")                 # append | overwrite | ignore | errorifexists
+   .partitionBy("order_date")         # low-cardinality columns only
+   .option("compression", "snappy")
+   .parquet("/lake/orders_clean"))
+
+# Delta with upsert (MERGE)
+from delta.tables import DeltaTable
+target = DeltaTable.forPath(spark, "/lake/delta/orders")
+(target.alias("t")
+   .merge(updates.alias("s"), "t.order_id = s.order_id")
+   .whenMatchedUpdateAll()
+   .whenNotMatchedInsertAll()
+   .execute())</code></pre>
+<table>
+<tr><th>Format</th><th>Use when</th><th>Notes</th></tr>
+<tr><td>Parquet</td><td>Analytics, default lake format</td><td>Columnar, compressed, predicate pushdown</td></tr>
+<tr><td>Delta</td><td>Need ACID, upserts, time travel</td><td>Parquet + transaction log; <code>OPTIMIZE</code>, <code>VACUUM</code></td></tr>
+<tr><td>CSV / JSON</td><td>Ingestion from external sources</td><td>Slow, no types; convert to Parquet/Delta early</td></tr>
+</table>
+<div class="callout warn"><b class="t">Warning</b>Avoid partitioning by high-cardinality columns (e.g. <code>user_id</code>) – it creates millions of tiny files. Aim for 128 MB–1 GB per output file.</div>
+</section>
+
+<section id="cols">
+<h2><span class="n">2.1</span>Columns, Filtering, Selection &amp; Renaming</h2>
+<pre data-lang="python"><code>from pyspark.sql import functions as F
+
+df2 = (df
+    .select("order_id", "customer_id", F.col("amount").alias("order_amount"), "created_at")
+    .withColumn("amount_usd", F.round(F.col("order_amount") * F.lit(1.0), 2))
+    .withColumn("order_date", F.to_date("created_at"))
+    .withColumn("size", F.when(F.col("order_amount") >= 1000, "large")
+                         .when(F.col("order_amount") >= 100,  "medium")
+                         .otherwise("small"))
+    .withColumnRenamed("customer_id", "cust_id")
+    .drop("created_at"))
+
+# Rename many columns at once
+df2 = df2.toDF(*[c.lower().replace(" ", "_") for c in df2.columns])
+
+# filter == where
+active = df2.filter((F.col("order_amount") > 50) &amp; F.col("size").isin("medium", "large"))
+active = df2.where("order_amount > 50 AND size IN ('medium','large')")   # SQL string form
+
+# Useful expressions
+df2.selectExpr("order_id", "order_amount * 1.1 AS with_tax")
+df2.filter(F.col("order_id").like("A%") | F.col("cust_id").isNull())
+df2.withColumns({"year": F.year("order_date"), "month": F.month("order_date")})  # Spark 3.3+</code></pre>
+<div class="callout tip"><b class="t">Tip</b>Use <code>&amp;</code>, <code>|</code>, <code>~</code> with parentheses around each condition – Python's <code>and</code>/<code>or</code>/<code>not</code> will raise errors. Prefer one <code>select</code> with many expressions over a long chain of <code>withColumn</code> calls on wide tables.</div>
+</section>
+
+<section id="joins">
+<h2><span class="n">2.2</span>Joins: Broadcast vs. Sort-Merge</h2>
+<pre data-lang="python"><code># join types: inner, left, right, full (outer), left_semi, left_anti, cross
+joined = orders.join(customers, on="cust_id", how="left")
+
+# Different column names -> explicit condition (alias to avoid ambiguity)
+o, c = orders.alias("o"), customers.alias("c")
+joined = o.join(c, F.col("o.cust_id") == F.col("c.id"), "inner").select("o.*", "c.name")
+
+# Anti join: customers with NO orders
+no_orders = customers.join(orders, customers.id == orders.cust_id, "left_anti")</code></pre>
+<table>
+<tr><th></th><th>Broadcast Hash Join</th><th>Sort-Merge Join</th></tr>
+<tr><td>How</td><td>Small table copied to every executor; no shuffle of big side</td><td>Both sides shuffled by key, sorted, then merged</td></tr>
+<tr><td>Use when</td><td>One side &lt; ~10–200 MB (<code>autoBroadcastJoinThreshold</code>)</td><td>Both sides large (default for big joins)</td></tr>
+<tr><td>Risk</td><td>Driver/executor OOM if "small" table is actually large</td><td>Expensive shuffle, skew</td></tr>
+</table>
+<pre data-lang="python"><code>from pyspark.sql.functions import broadcast
+
+# Force a broadcast join on a dimension table
+fact.join(broadcast(dim_country), "country_code").explain()
+# -> BroadcastHashJoin
+
+# SQL hints: BROADCAST, MERGE, SHUFFLE_HASH, SHUFFLE_REPLICATE_NL
+fact.join(dim.hint("shuffle_hash"), "id")</code></pre>
+<div class="callout warn"><b class="t">Gotcha</b>Joining on columns that contain <code>NULL</code> never matches (NULL ≠ NULL). Use <code>eqNullSafe</code> if nulls should match. Joining with <code>on="col"</code> (string) avoids duplicate key columns.</div>
+</section>
+
+<section id="agg">
+<h2><span class="n">2.3</span>Aggregations</h2>
+<pre data-lang="python"><code>daily = (orders
+    .groupBy("order_date", "region")
+    .agg(
+        F.count("*").alias("orders"),
+        F.countDistinct("cust_id").alias("customers"),
+        F.sum("amount").alias("revenue"),
+        F.avg("amount").alias("aov"),
+        F.max("amount").alias("max_order"),
+        F.collect_set("size").alias("sizes"),
+        F.percentile_approx("amount", 0.5).alias("median"),
+    )
+    .orderBy("order_date"))
+
+# Pivot (provide values to avoid an extra pass)
+pivoted = orders.groupBy("region").pivot("size", ["small","medium","large"]).sum("amount")
+
+# Multi-level subtotals
+orders.rollup("region", "size").agg(F.sum("amount")).show()
+orders.cube("region", "size").agg(F.sum("amount")).show()
+
+# Conditional aggregation
+orders.agg(F.sum(F.when(F.col("size") == "large", F.col("amount"))).alias("large_rev"))</code></pre>
+<div class="callout tip"><b class="t">Tip</b><code>countDistinct</code> is exact but costly; use <code>approx_count_distinct</code> (HyperLogLog) when ~2% error is acceptable. Avoid <code>collect_list</code> on unbounded groups – it can blow up executor memory.</div>
+</section>
+
+<!-- ============ MODULE 3 ============ -->
+<section id="window">
+<h2><span class="n">3</span>Window Functions</h2>
+<p>Windows compute a value per row using a related set of rows <i>without collapsing them</i> (unlike <code>groupBy</code>).</p>
+<pre data-lang="python"><code>from pyspark.sql import Window
+from pyspark.sql import functions as F
+
+w = Window.partitionBy("cust_id").orderBy(F.col("created_at").desc())
+
+ranked = (orders
+    .withColumn("rn",    F.row_number().over(w))   # 1,2,3,4 – unique
+    .withColumn("rk",    F.rank().over(w))         # 1,1,3,4 – gaps after ties
+    .withColumn("drk",   F.dense_rank().over(w))   # 1,1,2,3 – no gaps
+    .withColumn("prev",  F.lag("amount", 1).over(w))
+    .withColumn("next",  F.lead("amount", 1, 0).over(w)))   # default 0 instead of null
+
+# Classic: latest record per key
+latest = ranked.filter("rn = 1").drop("rn", "rk", "drk", "prev", "next")</code></pre>
+<h3>Frames: running totals &amp; moving averages</h3>
+<pre data-lang="python"><code>w_run = (Window.partitionBy("cust_id").orderBy("created_at")
+               .rowsBetween(Window.unboundedPreceding, Window.currentRow))
+w_7   = (Window.partitionBy("cust_id").orderBy("created_at").rowsBetween(-6, 0))
+
+orders = (orders
+    .withColumn("running_total", F.sum("amount").over(w_run))
+    .withColumn("moving_avg_7",  F.avg("amount").over(w_7))
+    .withColumn("pct_of_cust",   F.col("amount") / F.sum("amount").over(Window.partitionBy("cust_id")))
+    .withColumn("days_since_prev",
+                F.datediff("created_at", F.lag("created_at").over(Window.partitionBy("cust_id").orderBy("created_at")))))</code></pre>
+<table>
+<tr><th>Function</th><th>Ties</th><th>Typical use</th></tr>
+<tr><td><code>row_number</code></td><td>Arbitrary but unique</td><td>Dedup / latest row</td></tr>
+<tr><td><code>rank</code></td><td>Same rank, gaps follow</td><td>Competition ranking</td></tr>
+<tr><td><code>dense_rank</code></td><td>Same rank, no gaps</td><td>Top-N levels</td></tr>
+<tr><td><code>lag / lead</code></td><td>n/a</td><td>Change vs. previous period, sessionization</td></tr>
+</table>
+<div class="callout warn"><b class="t">Performance</b>A window without <code>partitionBy</code> moves all data to a single partition. Always partition, and add a deterministic tie-breaker to <code>orderBy</code> when using <code>row_number</code>.</div>
+</section>
+
+<section id="clean">
+<h2><span class="n">3.1</span>Missing Data &amp; Deduplication</h2>
+<pre data-lang="python"><code># Drop rows
+df.dropna()                                   # any null in any column
+df.dropna(how="all")                          # only if all columns null
+df.dropna(subset=["order_id", "amount"])      # required columns
+df.dropna(thresh=3)                           # keep rows with >= 3 non-null values
+
+# Fill
+df.fillna(0, subset=["amount"])
+df.fillna({"amount": 0.0, "region": "UNKNOWN"})
+df.withColumn("amount", F.coalesce("amount", F.lit(0)))   # column-wise fallback chain
+
+# NaN is not NULL for floats
+df.filter(~F.isnan("amount") &amp; F.col("amount").isNotNull())
+
+# Dedup
+df.distinct()                                 # full-row
+df.dropDuplicates(["order_id"])               # by key – which row survives is NOT deterministic
+
+# Deterministic dedup: keep latest per key
+w = Window.partitionBy("order_id").orderBy(F.col("updated_at").desc())
+dedup = df.withColumn("rn", F.row_number().over(w)).filter("rn = 1").drop("rn")</code></pre>
+<div class="callout tip"><b class="t">Tip</b>For streaming, <code>dropDuplicates</code> needs a watermark (<code>withWatermark</code>) or state grows forever.</div>
+</section>
+
+<!-- ============ MODULE 4 ============ -->
+<section id="partitions">
+<h2><span class="n">4</span>Performance Tuning: Partitions &amp; Shuffle</h2>
+<table>
+<tr><th></th><th><code>repartition(n, cols)</code></th><th><code>coalesce(n)</code></th></tr>
+<tr><td>Shuffle</td><td>Full shuffle</td><td>No shuffle (merges existing partitions)</td></tr>
+<tr><td>Direction</td><td>Increase or decrease</td><td>Decrease only</td></tr>
+<tr><td>Balance</td><td>Even sizes (hash/round-robin)</td><td>Can be uneven</td></tr>
+<tr><td>Use for</td><td>Parallelism, co-locating by key before joins/writes</td><td>Reducing output file count at end of job</td></tr>
+</table>
+<pre data-lang="python"><code>df.rdd.getNumPartitions()
+
+df = df.repartition(200, "cust_id")       # hash partition by key
+df = df.repartitionByRange(50, "order_date")
+
+# Avoid tiny files on write
+df.coalesce(10).write.mode("overwrite").parquet(out)
+# Or control per-partition-dir files
+df.repartition("order_date").write.partitionBy("order_date").parquet(out)
+
+# Config
+spark.conf.set("spark.sql.shuffle.partitions", 400)      # default 200
+spark.conf.set("spark.sql.files.maxPartitionBytes", 128 * 1024 * 1024)
+spark.conf.set("spark.sql.adaptive.coalescePartitions.enabled", True)   # AQE merges small shuffle partitions</code></pre>
+<h3>Rules of thumb</h3>
+<ul>
+<li>Target <b>100–200 MB per partition</b> and 2–4 tasks per CPU core.</li>
+<li>Too few partitions → idle cores, OOM/spills. Too many → scheduler overhead, small files.</li>
+<li>Filter and select <b>before</b> joins/aggregations to shrink shuffled data.</li>
+<li>Enable <b>AQE</b>: it coalesces partitions, switches to broadcast at runtime, and splits skewed partitions.</li>
+<li>Use the Spark UI → Stages tab: watch <i>Shuffle Read/Write</i>, <i>Spill</i> and the task duration spread.</li>
+</ul>
+</section>
+
+<section id="cache">
+<h2><span class="n">4.1</span>Caching &amp; Persistence</h2>
+<p>Cache a DataFrame only when it is <b>reused by multiple actions</b> and is expensive to recompute.</p>
+<pre data-lang="python"><code>from pyspark import StorageLevel
+
+clean = raw.filter("amount > 0").join(broadcast(dim), "id")
+
+clean.cache()                                   # = persist(MEMORY_AND_DISK) for DataFrames
+clean.persist(StorageLevel.MEMORY_AND_DISK_DESER)
+clean.count()                                   # cache is lazy – materialize with an action
+
+clean.groupBy("region").count().show()          # reuses cache
+clean.agg(F.sum("amount")).show()               # reuses cache
+
+clean.unpersist()                               # free memory when done
+spark.catalog.clearCache()</code></pre>
+<table>
+<tr><th>Storage level</th><th>Behaviour</th></tr>
+<tr><td><code>MEMORY_ONLY</code></td><td>Fastest; partitions that don't fit are recomputed</td></tr>
+<tr><td><code>MEMORY_AND_DISK</code></td><td>Spills to disk instead of recomputing (DataFrame default)</td></tr>
+<tr><td><code>DISK_ONLY</code></td><td>Slow but safe for large reusable data</td></tr>
+<tr><td><code>*_2</code> suffix</td><td>Replicated on two nodes (fault tolerance)</td></tr>
+<tr><td><code>OFF_HEAP</code></td><td>Avoids GC pressure; requires off-heap memory config</td></tr>
+</table>
+<div class="callout warn"><b class="t">Warning</b>Caching a DataFrame that is used once wastes memory. For very long lineages (iterative jobs) prefer <code>df.checkpoint()</code> to truncate the plan.</div>
+</section>
+
+<section id="bottlenecks">
+<h2><span class="n">4.2</span>Avoiding Common Bottlenecks</h2>
+<h3>Data skew</h3>
+<p>Symptom: one task runs far longer than the rest in the Spark UI. Cause: hot keys (e.g. <code>NULL</code>, "unknown", a mega-customer).</p>
+<pre data-lang="python"><code># 1) Let AQE split skewed partitions (Spark 3+)
+spark.conf.set("spark.sql.adaptive.skewJoin.enabled", True)
+
+# 2) Salting: spread a hot key across N buckets
+N = 16
+big   = big.withColumn("salt", (F.rand() * N).cast("int"))
+small = small.withColumn("salt", F.explode(F.array([F.lit(i) for i in range(N)])))
+joined = big.join(small, ["key", "salt"]).drop("salt")
+
+# 3) Isolate hot keys: broadcast-join them separately, sort-merge the rest
+# 4) Filter junk keys (NULLs) before the join</code></pre>
+<h3>Excessive shuffles</h3>
+<ul>
+<li>Chain operations that share a partitioning key; avoid repeated <code>repartition</code> and <code>orderBy</code> (a global sort is a shuffle – sort only at the end if needed).</li>
+<li>Prefer <code>reduceByKey</code>-style aggregations (<code>groupBy().agg()</code>) over <code>collect_list</code> + Python processing.</li>
+<li>Pre-bucket large tables joined often: <code>df.write.bucketBy(64, "cust_id").sortBy("cust_id").saveAsTable("t")</code> removes shuffles at join time.</li>
+</ul>
+<h3>UDF overhead</h3>
+<pre data-lang="python"><code># Slowest: Python UDF – row-by-row serialization, opaque to Catalyst
+@F.udf("string")
+def clean_slow(s):
+    return s.strip().lower() if s else None
+
+# Better: built-in functions (optimized, codegen)
+df.withColumn("name", F.lower(F.trim("name")))
+
+# If custom logic is unavoidable: pandas (vectorized) UDF with Arrow
+import pandas as pd
+from pyspark.sql.functions import pandas_udf
+
+@pandas_udf("double")
+def zscore(s: pd.Series) -> pd.Series:
+    return (s - s.mean()) / s.std()
+
+df.withColumn("z", zscore("amount"))</code></pre>
+<table>
+<tr><th>Problem</th><th>Detect</th><th>Fix</th></tr>
+<tr><td>Skew</td><td>Max task time ≫ median</td><td>AQE skew join, salting, filter nulls</td></tr>
+<tr><td>Spill</td><td>"Spill (disk)" in stage metrics</td><td>More partitions / executor memory</td></tr>
+<tr><td>Small files</td><td>Thousands of KB-sized files</td><td><code>coalesce</code>, Delta <code>OPTIMIZE</code>, AQE</td></tr>
+<tr><td>Driver OOM</td><td><code>collect</code>, <code>toPandas</code>, huge broadcast</td><td><code>limit</code>, write to storage instead</td></tr>
+<tr><td>Python UDF slow</td><td>BatchEvalPython in plan</td><td>Built-ins or <code>pandas_udf</code></td></tr>
+</table>
+</section>
+
+<!-- ============ MODULE 5 ============ -->
+<section id="sql">
+<h2><span class="n">5</span>PySpark SQL &amp; Integration</h2>
+<pre data-lang="python"><code>orders.createOrReplaceTempView("orders")                 # session-scoped
+customers.createOrReplaceGlobalTempView("customers")     # shared across sessions: global_temp.customers
+
+result = spark.sql("""
+    WITH monthly AS (
+        SELECT cust_id,
+               date_trunc('month', created_at) AS month,
+               SUM(amount)                      AS revenue
+        FROM orders
+        WHERE created_at >= '2026-01-01'
+        GROUP BY 1, 2
+    )
+    SELECT m.*,
+           c.name,
+           RANK() OVER (PARTITION BY month ORDER BY revenue DESC) AS rnk
+    FROM monthly m
+    JOIN global_temp.customers c ON c.id = m.cust_id
+""")
+
+result.filter("rnk <= 10").show()          # SQL and DataFrame API mix freely
+
+# Persistent tables / catalog
+result.write.mode("overwrite").saveAsTable("analytics.top_customers")
+spark.sql("SHOW TABLES IN analytics").show()
+spark.catalog.listTables("analytics")</code></pre>
+<div class="callout tip"><b class="t">Tip</b>SQL and DataFrame code compile to the same Catalyst plan – choose whichever is more readable. Use SQL for complex CTE-heavy logic and the DataFrame API for programmatic/parameterized pipelines. Use parameter markers (<code>spark.sql("... WHERE id = :id", args={"id": 5})</code>, Spark 3.4+) instead of f-strings to avoid SQL injection.</div>
+</section>
+
+<section id="pandas">
+<h2><span class="n">5.1</span>Pandas Interoperability &amp; Arrow</h2>
+<pre data-lang="python"><code># Enable Arrow-based columnar transfer (big speedup for toPandas / createDataFrame)
+spark.conf.set("spark.sql.execution.arrow.pyspark.enabled", "true")
+spark.conf.set("spark.sql.execution.arrow.pyspark.fallback.enabled", "true")
+
+# Spark -> Pandas: collects EVERYTHING to the driver
+small_pdf = df.limit(100_000).toPandas()          # always bound the size
+
+# Pandas -> Spark
+sdf = spark.createDataFrame(small_pdf)
+
+# Distributed pandas: mapInPandas / applyInPandas run on executors
+def top_per_group(pdf: pd.DataFrame) -> pd.DataFrame:
+    return pdf.nlargest(3, "amount")
+
+top3 = (orders.groupBy("region")
+              .applyInPandas(top_per_group, schema=orders.schema))
+
+# pandas API on Spark (distributed, pandas-like syntax)
+import pyspark.pandas as ps
+psdf = df.pandas_api()
+psdf.groupby("region")["amount"].mean()</code></pre>
+<table>
+<tr><th></th><th>Plain <code>toPandas()</code></th><th>Arrow-enabled</th></tr>
+<tr><td>Transfer</td><td>Row-by-row pickling</td><td>Columnar batches, zero-copy where possible</td></tr>
+<tr><td>Speed</td><td>Slow</td><td>Typically 10×–100× faster</td></tr>
+<tr><td>Limits</td><td>Driver memory</td><td>Driver memory; some complex types unsupported (falls back)</td></tr>
+</table>
+<div class="callout warn"><b class="t">Rule</b><code>toPandas()</code> is for small results (aggregates, samples, plots). If the data doesn't fit on the driver, stay in Spark or use <code>applyInPandas</code> / <code>pandas_udf</code>.</div>
+</section>
+
+<!-- ============ MODULE 6 ============ -->
+<section id="strdate">
+<h2><span class="n">6</span>Everyday Functions: Strings &amp; Dates</h2>
+<h3>String functions</h3>
+<pre data-lang="python"><code>from pyspark.sql import functions as F
+
+df = (df
+  .withColumn("name_clean", F.initcap(F.trim(F.lower("name"))))
+  .withColumn("digits",     F.regexp_replace("phone", r"[^0-9]", ""))          # strip non-digits
+  .withColumn("domain",     F.regexp_extract("email", r"@(.+)$", 1))           # capture group 1
+  .withColumn("first",      F.split("full_name", " ").getItem(0))
+  .withColumn("key",        F.concat_ws("-", "country", "region", "id"))       # skips nulls
+  .withColumn("padded_id",  F.lpad("id", 8, "0"))
+  .withColumn("short",      F.substring("description", 1, 50))
+  .withColumn("has_gmail",  F.col("email").contains("gmail") | F.col("email").rlike(r"@gmail\.")))
+
+# Hashing – handy for change detection and surrogate keys
+df = df.withColumn("row_hash", F.sha2(F.concat_ws("||", "name", "city", "email"), 256))</code></pre>
+<h3>Date &amp; timestamp functions</h3>
+<pre data-lang="python"><code>df = (df
+  .withColumn("ts",        F.to_timestamp("ts_str", "yyyy-MM-dd HH:mm:ss"))
+  .withColumn("d",         F.to_date("ts"))
+  .withColumn("yr",        F.year("d")).withColumn("mon", F.month("d")).withColumn("dow", F.dayofweek("d"))
+  .withColumn("next_week", F.date_add("d", 7))
+  .withColumn("prev_month",F.add_months("d", -1))
+  .withColumn("age_days",  F.datediff(F.current_date(), "d"))
+  .withColumn("months_btw",F.months_between(F.current_date(), "d"))
+  .withColumn("month_start", F.trunc("d", "month"))                 # first day of month
+  .withColumn("hour_bucket", F.date_trunc("hour", "ts"))
+  .withColumn("fmt",       F.date_format("ts", "yyyy/MM/dd"))
+  .withColumn("last_day",  F.last_day("d"))
+  .withColumn("utc_to_ist",F.from_utc_timestamp("ts", "Asia/Kolkata"))
+  .withColumn("epoch",     F.unix_timestamp("ts")))
+
+# Fixed-size time windows (e.g. 15-minute buckets)
+events.groupBy(F.window("ts", "15 minutes")).count()</code></pre>
+<div class="callout warn"><b class="t">Gotcha</b>Bad date strings silently become <code>NULL</code> (unless ANSI mode is on). Count nulls after <code>to_date</code>/<code>to_timestamp</code> to catch format mismatches. Spark 3 uses Java <code>DateTimeFormatter</code> patterns – <code>MM</code> is month, <code>mm</code> is minute.</div>
+</section>
+
+<section id="complex">
+<h2><span class="n">6.1</span>Complex Types: Arrays, Structs, Maps &amp; JSON</h2>
+<pre data-lang="python"><code># ---------- explode arrays ----------
+orders.select("order_id", F.explode("items").alias("item"))                  # drops rows with null/empty array
+orders.select("order_id", F.explode_outer("items").alias("item"))            # keeps them with null
+orders.select("order_id", F.posexplode("items").alias("pos", "item"))        # with index
+
+# ---------- structs: dot access & flattening ----------
+flat = (orders
+    .select("order_id", "item.*")                                            # expand all struct fields
+    .withColumn("city", F.col("address.city")))
+
+# ---------- array functions ----------
+df.select(
+    F.size("tags"), F.array_contains("tags", "vip"),
+    F.array_distinct("tags"), F.sort_array("tags"),
+    F.array_join("tags", ","), F.slice("tags", 1, 3),
+    F.transform("nums", lambda x: x * 2),                                    # higher-order functions (3.1+)
+    F.filter("nums", lambda x: x > 0),
+    F.aggregate("nums", F.lit(0), lambda acc, x: acc + x),
+)
+
+# ---------- maps ----------
+df.select(F.map_keys("attrs"), F.map_values("attrs"), F.col("attrs")["color"])
+df.select(F.create_map(F.lit("k"), F.col("v")))
+
+# ---------- build structs / arrays ----------
+df.select(F.struct("a", "b").alias("s"), F.array("x", "y").alias("arr"))
+df.groupBy("cust_id").agg(F.collect_list(F.struct("order_id", "amount")).alias("orders"))
+
+# ---------- JSON strings <-> structs ----------
+from pyspark.sql.types import StructType, StructField, StringType, ArrayType, DoubleType
+json_schema = StructType([
+    StructField("id", StringType()),
+    StructField("tags", ArrayType(StringType())),
+    StructField("geo", StructType([StructField("lat", DoubleType()), StructField("lon", DoubleType())])),
+])
+parsed = raw.withColumn("j", F.from_json("payload", json_schema)).select("j.*", "j.geo.lat")
+as_text = parsed.withColumn("payload2", F.to_json(F.struct("id", "tags")))
+quick   = raw.select(F.get_json_object("payload", "$.geo.lat").alias("lat"))   # one-off extraction, no schema</code></pre>
+<div class="callout tip"><b class="t">Tip</b>Prefer built-in higher-order functions (<code>transform</code>, <code>filter</code>, <code>aggregate</code>) over exploding and re-grouping – they avoid a shuffle. Use <code>schema_of_json</code> on a sample record to bootstrap a schema, then hard-code it.</div>
+</section>
+
+<section id="setops">
+<h2><span class="n">6.2</span>Set Operations &amp; Combining DataFrames</h2>
+<pre data-lang="python"><code>a.union(b)                          # by POSITION, keeps duplicates (SQL UNION ALL)
+a.unionByName(b)                    # by column NAME – safer
+a.unionByName(b, allowMissingColumns=True)   # missing cols filled with null (3.1+)
+a.union(b).distinct()               # SQL UNION
+
+a.intersect(b)                      # distinct common rows
+a.subtract(b)                       # rows in a not in b (distinct)  == EXCEPT DISTINCT
+a.exceptAll(b)                      # keeps duplicate counts          == EXCEPT ALL
+
+# Combine many files/frames
+from functools import reduce
+from pyspark.sql import DataFrame
+combined = reduce(DataFrame.unionByName, [df1, df2, df3])
+
+# Reconciliation: rows that differ between two versions
+missing_in_new = old.exceptAll(new)
+added_in_new   = new.exceptAll(old)</code></pre>
+</section>
+
+<section id="schema">
+<h2><span class="n">6.3</span>Casting, Schema Inspection &amp; DDL Schemas</h2>
+<pre data-lang="python"><code>from pyspark.sql.types import IntegerType, DecimalType
+
+df = (df
+   .withColumn("qty",    F.col("qty").cast("int"))
+   .withColumn("price",  F.col("price").cast(DecimalType(18, 2)))     # use Decimal for money, not double
+   .withColumn("active", F.col("active").cast("boolean")))
+
+# DDL-string schema – much shorter than StructType
+ddl = "order_id STRING, cust_id BIGINT, amount DECIMAL(18,2), created_at TIMESTAMP, tags ARRAY&lt;STRING&gt;"
+df = spark.read.schema(ddl).json("/landing/orders")
+
+df.printSchema()
+df.dtypes                  # [('order_id','string'), ...]
+df.schema.simpleString()
+df.columns
+
+# Apply a target schema to a DataFrame (reorder + cast)
+target = spark.table("silver.orders")
+df = df.select([F.col(f.name).cast(f.dataType) for f in target.schema.fields])
+
+# Safe casts: try_cast-style via SQL (Spark 3.4+) returns NULL instead of failing under ANSI mode
+df.selectExpr("try_cast(qty_str AS INT) AS qty")</code></pre>
+</section>
+
+<!-- ============ MODULE 7 ============ -->
+<section id="upsert">
+<h2><span class="n">7</span>Upsert (MERGE) with Delta Lake</h2>
+<p>An <b>upsert</b> updates rows that already exist in the target and inserts those that don't. Delta's <code>MERGE</code> does this atomically (ACID), so readers never see a half-applied batch.</p>
+<h3>Python API</h3>
+<pre data-lang="python"><code>from delta.tables import DeltaTable
+from pyspark.sql import Window, functions as F
+
+# 1) ALWAYS dedupe the source: MERGE fails if multiple source rows match one target row
+w = Window.partitionBy("order_id").orderBy(F.col("updated_at").desc())
+updates = (raw_updates.withColumn("rn", F.row_number().over(w))
+                      .filter("rn = 1").drop("rn"))
+
+target = DeltaTable.forName(spark, "silver.orders")        # or forPath(spark, "/lake/silver/orders")
+
+(target.alias("t")
+   .merge(updates.alias("s"), "t.order_id = s.order_id")
+   .whenMatchedUpdate(
+        condition="s.updated_at &gt; t.updated_at",               # only newer versions win; skips no-op writes
+        set={"amount": "s.amount", "status": "s.status", "updated_at": "s.updated_at"})
+   .whenMatchedDelete(condition="s.is_deleted = true")        # propagate deletes (CDC)
+   .whenNotMatchedInsertAll()
+   .execute())</code></pre>
+<h3>SQL form</h3>
+<pre data-lang="sql"><code>updates.createOrReplaceTempView("updates")
+
+MERGE INTO silver.orders AS t
+USING updates AS s
+  ON t.order_id = s.order_id
+WHEN MATCHED AND s.is_deleted = true THEN DELETE
+WHEN MATCHED AND s.updated_at &gt; t.updated_at THEN UPDATE SET *
+WHEN NOT MATCHED THEN INSERT *;</code></pre>
+<h3>Upsert on plain Parquet (no Delta)</h3>
+<pre data-lang="python"><code># Option A: rewrite only touched partitions (idempotent)
+spark.conf.set("spark.sql.sources.partitionOverwriteMode", "dynamic")
+(updates.write.mode("overwrite").partitionBy("order_date").parquet("/lake/orders"))
+
+# Option B: anti-join + union (small/medium tables)
+untouched = existing.join(updates, "order_id", "left_anti")
+result    = untouched.unionByName(updates)
+result.write.mode("overwrite").parquet("/lake/orders_new")      # write to a NEW path, then swap</code></pre>
+<div class="callout tip"><b class="t">Performance</b>Add partition columns to the merge condition (<code>t.order_date = s.order_date AND t.order_id = s.order_id</code>) so Delta prunes files instead of scanning the entire table. Enable <code>spark.databricks.delta.schema.autoMerge.enabled</code> only if you intentionally want new source columns added.</div>
+</section>
+
+<section id="scd1">
+<h2><span class="n">7.1</span>SCD Type 1 – Overwrite (No History)</h2>
+<p>Changed attributes simply <b>overwrite</b> the old value. Use when history doesn't matter (typo fixes, current email).</p>
+<pre data-lang="python"><code>from delta.tables import DeltaTable
+from pyspark.sql import functions as F
+
+# Source: today's customer snapshot / CDC feed
+src = (spark.read.parquet("/landing/customers")
+         .withColumn("row_hash", F.sha2(F.concat_ws("||", "name", "email", "city"), 256))
+         .withColumn("updated_at", F.current_timestamp()))
+
+dim = DeltaTable.forName(spark, "gold.dim_customer_scd1")
+
+(dim.alias("t")
+   .merge(src.alias("s"), "t.customer_id = s.customer_id")
+   .whenMatchedUpdate(
+        condition="t.row_hash &lt;&gt; s.row_hash",               # touch only rows that really changed
+        set={"name": "s.name", "email": "s.email", "city": "s.city",
+             "row_hash": "s.row_hash", "updated_at": "s.updated_at"})
+   .whenNotMatchedInsertAll()
+   .execute())</code></pre>
+<table>
+<tr><th>customer_id</th><th>city (before)</th><th>incoming</th><th>city (after, SCD1)</th></tr>
+<tr><td>101</td><td>Pune</td><td>Mumbai</td><td>Mumbai <i>(Pune is lost)</i></td></tr>
+</table>
+</section>
+
+<section id="scd2">
+<h2><span class="n">7.2</span>SCD Type 2 – Full History</h2>
+<p>Each change <b>closes</b> the current row (sets an end date, <code>is_current = false</code>) and <b>inserts a new row</b>. You can then query the dimension "as of" any date.</p>
+<h3>Target table</h3>
+<pre data-lang="sql"><code>CREATE TABLE IF NOT EXISTS gold.dim_customer_scd2 (
+  customer_sk    BIGINT GENERATED ALWAYS AS IDENTITY,   -- surrogate key (Delta identity column)
+  customer_id    BIGINT,                                -- business key
+  name           STRING,
+  email          STRING,
+  city           STRING,
+  row_hash       STRING,
+  effective_from TIMESTAMP,
+  effective_to   TIMESTAMP,                             -- NULL = still open
+  is_current     BOOLEAN
+) USING DELTA;</code></pre>
+<h3>Single-MERGE pattern (close old + insert new)</h3>
+<pre data-lang="python"><code>from delta.tables import DeltaTable
+from pyspark.sql import functions as F
+
+dim = DeltaTable.forName(spark, "gold.dim_customer_scd2")
+cur = dim.toDF().filter("is_current = true")
+
+src = (spark.read.parquet("/landing/customers")                      # one row per customer_id!
+         .withColumn("row_hash", F.sha2(F.concat_ws("||", "name", "email", "city"), 256))
+         .withColumn("load_ts", F.current_timestamp()))
+
+# 1) Only new customers or customers whose tracked attributes changed
+changed = (src.alias("s")
+             .join(cur.alias("t"), "customer_id", "left")
+             .filter("t.row_hash IS NULL OR s.row_hash &lt;&gt; t.row_hash")
+             .select("s.*"))
+
+# 2) Two copies of each changed row:
+#    - merge_key = business key  -&gt; MATCHES the open row  -&gt; will CLOSE it
+#    - merge_key = NULL          -&gt; matches nothing        -&gt; will INSERT the new version
+to_close = (changed.join(cur.select("customer_id"), "customer_id", "left_semi")   # only if an open row exists
+                   .withColumn("merge_key", F.col("customer_id")))
+to_insert = changed.withColumn("merge_key", F.lit(None).cast("bigint"))
+staged = to_close.unionByName(to_insert)
+
+# 3) Apply
+(dim.alias("t")
+   .merge(staged.alias("s"), "t.customer_id = s.merge_key AND t.is_current = true")
+   .whenMatchedUpdate(set={
+        "is_current":   "false",
+        "effective_to": "s.load_ts"})
+   .whenNotMatchedInsert(values={
+        "customer_id":    "s.customer_id",
+        "name":           "s.name",
+        "email":          "s.email",
+        "city":           "s.city",
+        "row_hash":       "s.row_hash",
+        "effective_from": "s.load_ts",
+        "effective_to":   "NULL",
+        "is_current":     "true"})
+   .execute())</code></pre>
+<h3>Result after customer 101 moves Pune → Mumbai</h3>
+<table>
+<tr><th>customer_id</th><th>city</th><th>effective_from</th><th>effective_to</th><th>is_current</th></tr>
+<tr><td>101</td><td>Pune</td><td>2025-01-10</td><td>2026-10-30</td><td>false</td></tr>
+<tr><td>101</td><td>Mumbai</td><td>2026-10-30</td><td>NULL</td><td>true</td></tr>
+</table>
+<h3>Querying SCD2</h3>
+<pre data-lang="sql"><code>-- Current state
+SELECT * FROM gold.dim_customer_scd2 WHERE is_current = true;
+
+-- Point-in-time ("as of") join from a fact table
+SELECT f.order_id, f.order_ts, d.city
+FROM silver.orders f
+JOIN gold.dim_customer_scd2 d
+  ON  f.customer_id = d.customer_id
+  AND f.order_ts &gt;= d.effective_from
+  AND f.order_ts &lt;  COALESCE(d.effective_to, TIMESTAMP '9999-12-31');</code></pre>
+<div class="callout warn"><b class="t">Pitfalls</b>
+<ul>
+<li>Source must have <b>one row per business key</b> per run – dedupe first, or multiple changes in one batch need ordered processing.</li>
+<li>Pick the tracked columns deliberately (the <code>row_hash</code> input). Tracking noisy columns creates endless versions.</li>
+<li>Use the source's change timestamp for <code>effective_from</code> when available, not the load time, so history is accurate when jobs are re-run.</li>
+<li>Keep the job idempotent: re-running the same batch must not create duplicate versions (the hash comparison guarantees this).</li>
+<li>In Databricks, <code>APPLY CHANGES INTO ... STORED AS SCD TYPE 2</code> (Delta Live Tables) does all this declaratively.</li>
+</ul></div>
+<table>
+<tr><th></th><th>SCD1</th><th>SCD2</th></tr>
+<tr><td>History kept</td><td>No</td><td>Yes (row per version)</td></tr>
+<tr><td>Table growth</td><td>Flat</td><td>Grows with changes</td></tr>
+<tr><td>Fact join</td><td>Simple key join</td><td>Surrogate key or date-range join</td></tr>
+<tr><td>Use for</td><td>Corrections, non-analytic attributes</td><td>Address, segment, price tier, anything reported historically</td></tr>
+</table>
+</section>
+
+<section id="deltamaint">
+<h2><span class="n">7.3</span>Delta Maintenance, Time Travel &amp; Schema Evolution</h2>
+<pre data-lang="sql"><code>-- Compact small files; co-locate rows for faster filters
+OPTIMIZE silver.orders ZORDER BY (customer_id);
+
+-- Remove files no longer referenced (default retention 7 days = 168 hours)
+VACUUM silver.orders RETAIN 168 HOURS;
+
+-- Audit & time travel
+DESCRIBE HISTORY silver.orders;
+SELECT * FROM silver.orders VERSION AS OF 12;
+SELECT * FROM silver.orders TIMESTAMP AS OF '2026-10-01';
+RESTORE TABLE silver.orders TO VERSION AS OF 12;
+
+-- Table info
+DESCRIBE DETAIL silver.orders;</code></pre>
+<pre data-lang="python"><code># Schema evolution on append
+(new_df.write.format("delta").mode("append")
+       .option("mergeSchema", "true")            # add new columns
+       .saveAsTable("silver.orders"))
+
+# Overwrite schema entirely (breaking change – be careful)
+(df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable("silver.orders"))
+
+# Delete / update in place
+from delta.tables import DeltaTable
+dt = DeltaTable.forName(spark, "silver.orders")
+dt.delete("order_date &lt; '2020-01-01'")
+dt.update("status = 'NEW'", {"status": "'OPEN'"})</code></pre>
+<div class="callout tip"><b class="t">Tip</b>Schedule <code>OPTIMIZE</code> after heavy write/merge jobs and <code>VACUUM</code> weekly. Don't set VACUUM retention below your longest-running reader or time-travel needs.</div>
+</section>
+
+<section id="dbwrite">
+<h2><span class="n">7.4</span>Databricks: DataFrame → Delta Table → Unity Catalog Volume</h2>
+<p>Typical flow: transform a DataFrame, <b>save it as a governed Delta table</b> (<code>catalog.schema.table</code>), then <b>export files to a Volume</b> (<code>/Volumes/catalog/schema/volume/...</code>) for sharing, downstream tools or archival.</p>
+
+<h3>1. Write a DataFrame to a Delta table</h3>
+<pre data-lang="python"><code># df = your transformed DataFrame
+catalog, schema, table = "main", "sales", "orders_clean"
+full_name = f"{catalog}.{schema}.{table}"
+
+spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{schema}")
+
+# --- Managed Delta table (Delta is the default format on Databricks) ---
+(df.write
+   .format("delta")
+   .mode("overwrite")                    # overwrite | append | ignore | errorifexists
+   .option("overwriteSchema", "true")    # only when the schema intentionally changed
+   .saveAsTable(full_name))
+
+# --- Append new data ---
+df_new.write.format("delta").mode("append").saveAsTable(full_name)
+
+# --- Partitioned table (low-cardinality column, big tables only) ---
+(df.write.format("delta").mode("overwrite")
+   .partitionBy("order_date")
+   .saveAsTable(full_name))
+
+# --- Overwrite just one slice (safe, idempotent re-runs) ---
+(df_today.write.format("delta").mode("overwrite")
+   .option("replaceWhere", "order_date = '2026-10-30'")
+   .saveAsTable(full_name))
+
+# --- Insert into an existing table (matches columns by POSITION; use byName for safety) ---
+df.write.insertInto(full_name, overwrite=False)
+# or SQL:  INSERT INTO main.sales.orders_clean BY NAME SELECT * FROM tmp_view
+
+# --- Verify ---
+spark.table(full_name).printSchema()
+display(spark.sql(f"SELECT COUNT(*) AS rows FROM {full_name}"))
+display(spark.sql(f"DESCRIBE DETAIL {full_name}"))</code></pre>
+<h3>Create the table first (explicit DDL), then load</h3>
+<pre data-lang="sql"><code>CREATE TABLE IF NOT EXISTS main.sales.orders_clean (
+  order_id    STRING NOT NULL,
+  cust_id     BIGINT,
+  amount      DECIMAL(18,2),
+  order_date  DATE
+) USING DELTA
+PARTITIONED BY (order_date)
+COMMENT 'Cleaned orders';</code></pre>
+<div class="callout tip"><b class="t">Managed vs external</b><b>Managed</b> (<code>saveAsTable</code> with no path): Unity Catalog owns storage; dropping the table deletes the data. <b>External</b>: add <code>.option("path", "abfss://.../orders")</code> (or <code>s3://</code>, <code>gs://</code>) and the data survives <code>DROP TABLE</code>; the location must be covered by a Unity Catalog external location.</div>
+
+<h3>2. Write the data to a Volume (files)</h3>
+<p>Volumes are for <b>files</b> (CSV, JSON, Parquet, images, exports). Create one once, then use the path <code>/Volumes/&lt;catalog&gt;/&lt;schema&gt;/&lt;volume&gt;/...</code>.</p>
+<pre data-lang="python"><code>spark.sql("CREATE VOLUME IF NOT EXISTS main.sales.exports")      # managed volume
+
+vol = "/Volumes/main/sales/exports"
+
+# Read from the Delta table you just wrote
+out_df = spark.table("main.sales.orders_clean")
+
+# --- Parquet (best for re-reading with Spark) ---
+out_df.write.mode("overwrite").parquet(f"{vol}/orders_parquet")
+
+# --- CSV (folder of part files) ---
+(out_df.write.mode("overwrite")
+   .option("header", True)
+   .csv(f"{vol}/orders_csv"))
+
+# --- JSON ---
+out_df.write.mode("overwrite").json(f"{vol}/orders_json")
+
+# --- Delta files in a Volume path (works, but not registered as a table) ---
+out_df.write.format("delta").mode("overwrite").save(f"{vol}/orders_delta")
+
+# --- Read back to verify ---
+back = spark.read.option("header", True).csv(f"{vol}/orders_csv")
+back.show(5)
+display(dbutils.fs.ls(vol))</code></pre>
+<h3>Single named CSV file (for hand-off to humans / other tools)</h3>
+<pre data-lang="python"><code>tmp_dir = f"{vol}/_tmp_orders_csv"
+final   = f"{vol}/orders_2026-10-30.csv"
+
+(out_df.coalesce(1)                       # one part file -&gt; only for SMALL data
+   .write.mode("overwrite").option("header", True).csv(tmp_dir))
+
+part = [f.path for f in dbutils.fs.ls(tmp_dir) if f.name.startswith("part-") and f.name.endswith(".csv")][0]
+dbutils.fs.cp(part, final)
+dbutils.fs.rm(tmp_dir, True)              # clean up the temp folder
+
+# Small results via pandas – Volumes behave like a normal POSIX filesystem
+out_df.limit(100_000).toPandas().to_csv(f"{vol}/orders_small.csv", index=False)</code></pre>
+<h3>Other direction: Volume files → Delta table</h3>
+<pre data-lang="python"><code>raw = (spark.read.option("header", True).schema(ddl)
+         .csv("/Volumes/main/sales/landing/orders/*.csv"))
+raw.write.format("delta").mode("append").saveAsTable("main.sales.orders_raw")</code></pre>
+<div class="callout warn"><b class="t">Requirements</b>You need <code>USE CATALOG</code>, <code>USE SCHEMA</code> and <code>CREATE TABLE</code> on the schema for tables, and <code>WRITE VOLUME</code> on the volume for exports (<code>READ VOLUME</code> to read). Avoid <code>coalesce(1)</code> on large data – it funnels everything through one task. Don't use legacy <code>dbfs:/mnt/...</code> paths for new work; use tables and Volumes.</div>
+</section>
+
+<!-- ============ MODULE 8 ============ -->
+<section id="streaming">
+<h2><span class="n">8</span>Structured Streaming Essentials</h2>
+<p>A streaming DataFrame is an unbounded table; the same DataFrame API applies. Progress is tracked in a <b>checkpoint</b> directory, which gives restartability and exactly-once semantics with idempotent/transactional sinks like Delta.</p>
+<pre data-lang="python"><code>from pyspark.sql import functions as F
+
+# ---- Source: Kafka ----
+raw = (spark.readStream.format("kafka")
+         .option("kafka.bootstrap.servers", "broker:9092")
+         .option("subscribe", "orders")
+         .option("startingOffsets", "latest")
+         .load())
+
+events = (raw.select(F.from_json(F.col("value").cast("string"), json_schema).alias("e"))
+             .select("e.*")
+             .withColumn("event_ts", F.to_timestamp("event_time")))
+
+# ---- Windowed aggregation with watermark (bounds state, drops very late data) ----
+agg = (events
+   .withWatermark("event_ts", "10 minutes")
+   .groupBy(F.window("event_ts", "5 minutes"), "region")
+   .agg(F.sum("amount").alias("revenue")))
+
+# ---- Sink: Delta, append mode ----
+query = (agg.writeStream
+   .format("delta")
+   .outputMode("append")                            # append | update | complete
+   .option("checkpointLocation", "/chk/orders_agg") # one unique path per query
+   .trigger(processingTime="1 minute")              # or availableNow=True for incremental batch
+   .toTable("gold.revenue_5min"))
+
+query.status; query.lastProgress; query.awaitTermination()</code></pre>
+<h3>Streaming upsert with <code>foreachBatch</code></h3>
+<pre data-lang="python"><code>def upsert_batch(batch_df, batch_id):
+    latest = (batch_df.withColumn("rn", F.row_number().over(
+                  Window.partitionBy("order_id").orderBy(F.col("updated_at").desc())))
+                      .filter("rn = 1").drop("rn"))
+    (DeltaTable.forName(spark, "silver.orders").alias("t")
+        .merge(latest.alias("s"), "t.order_id = s.order_id")
+        .whenMatchedUpdateAll().whenNotMatchedInsertAll().execute())
+
+(events.writeStream
+   .foreachBatch(upsert_batch)
+   .option("checkpointLocation", "/chk/orders_upsert")
+   .trigger(availableNow=True)                      # process everything new, then stop (cheap scheduled job)
+   .start())</code></pre>
+<div class="callout tip"><b class="t">Auto Loader (Databricks)</b>For file ingestion use <code>spark.readStream.format("cloudFiles").option("cloudFiles.format","json")...</code> – it tracks new files incrementally and supports schema evolution.</div>
+<div class="callout warn"><b class="t">Rules</b>Never delete or share a checkpoint directory between queries. Without a watermark, aggregation/dedup state grows unbounded. Changing the query logic may require a new checkpoint.</div>
+</section>
+
+<!-- ============ MODULE 9 ============ -->
+<section id="testing">
+<h2><span class="n">9</span>Project Structure &amp; Testing Transformations</h2>
+<p>Write transformations as <b>pure functions</b> (DataFrame in → DataFrame out), keep I/O at the edges, and chain them with <code>DataFrame.transform</code>.</p>
+<pre data-lang="python"><code># transforms.py
+from pyspark.sql import DataFrame, functions as F
+
+def add_order_size(df: DataFrame) -&gt; DataFrame:
+    return df.withColumn("size", F.when(F.col("amount") &gt;= 1000, "large").otherwise("small"))
+
+def dedupe_latest(df: DataFrame, key: str, order_col: str) -&gt; DataFrame:
+    from pyspark.sql import Window
+    w = Window.partitionBy(key).orderBy(F.col(order_col).desc())
+    return df.withColumn("_rn", F.row_number().over(w)).filter("_rn = 1").drop("_rn")
+
+# job.py
+result = (spark.read.parquet(src)
+            .transform(dedupe_latest, "order_id", "updated_at")
+            .transform(add_order_size))
+result.write.mode("overwrite").parquet(dst)</code></pre>
+<pre data-lang="python"><code># test_transforms.py  (run with: pytest -q)
+import pytest
+from pyspark.sql import SparkSession
+from transforms import add_order_size, dedupe_latest
+
+@pytest.fixture(scope="session")
+def spark():
+    s = (SparkSession.builder.master("local[2]")
+         .config("spark.sql.shuffle.partitions", "2")      # keep tests fast
+         .config("spark.ui.enabled", "false")
+         .getOrCreate())
+    yield s
+    s.stop()
+
+def test_add_order_size(spark):
+    df = spark.createDataFrame([(1, 50.0), (2, 5000.0)], ["id", "amount"])
+    out = {r.id: r.size for r in add_order_size(df).collect()}
+    assert out == {1: "small", 2: "large"}
+
+def test_dedupe_latest(spark):
+    df = spark.createDataFrame([("a", 1), ("a", 2), ("b", 1)], ["order_id", "updated_at"])
+    out = dedupe_latest(df, "order_id", "updated_at")
+    assert out.count() == 2
+    assert out.filter("order_id = 'a'").first().updated_at == 2
+
+# Built-in DataFrame comparison (Spark 3.5+)
+# from pyspark.testing import assertDataFrameEqual
+# assertDataFrameEqual(actual_df, expected_df)</code></pre>
+</section>
+
+<section id="dq">
+<h2><span class="n">9.1</span>Data Quality Checks</h2>
+<pre data-lang="python"><code>def run_dq(df, key_cols, required_cols, min_rows=1):
+    problems = []
+    total = df.count()
+    if total &lt; min_rows:
+        problems.append(f"row count {total} &lt; {min_rows}")
+
+    # nulls in required columns
+    null_counts = df.select([F.sum(F.col(c).isNull().cast("int")).alias(c) for c in required_cols]).first().asDict()
+    problems += [f"{c}: {n} nulls" for c, n in null_counts.items() if n]
+
+    # duplicate keys
+    dups = df.groupBy(*key_cols).count().filter("count &gt; 1").count()
+    if dups:
+        problems.append(f"{dups} duplicate keys on {key_cols}")
+
+    # range / domain rules
+    bad = df.filter("amount &lt; 0 OR status NOT IN ('NEW','OPEN','CLOSED')").count()
+    if bad:
+        problems.append(f"{bad} rows violate business rules")
+
+    if problems:
+        raise ValueError("Data quality failed: " + "; ".join(problems))
+    return total
+
+run_dq(clean_df, ["order_id"], ["order_id", "cust_id", "amount"])
+
+# Quarantine bad rows instead of failing the whole load
+good = df.filter("amount IS NOT NULL AND amount &gt;= 0")
+bad  = df.exceptAll(good).withColumn("_rejected_at", F.current_timestamp())
+bad.write.mode("append").format("delta").saveAsTable("quarantine.orders")</code></pre>
+<div class="callout tip"><b class="t">Tip</b>Each <code>count()</code> is a full job. Compute all metrics in one <code>agg</code> and <code>cache()</code> the DataFrame if you run several checks. Delta <code>CHECK</code> constraints (<code>ALTER TABLE t ADD CONSTRAINT c CHECK (amount &gt;= 0)</code>) enforce rules at write time.</div>
+</section>
+
+<section id="debug">
+<h2><span class="n">9.2</span>Debugging &amp; Common Errors</h2>
+<pre data-lang="python"><code># Develop on a slice, not the full dataset
+dev = df.limit(1000)                         # fast but not random
+dev = df.sample(fraction=0.01, seed=42)      # random sample
+
+df.explain("formatted")                      # what will run?
+df.show(20, truncate=False, vertical=True)   # inspect wide / long values
+df.rdd.glom().map(len).collect()             # rows per partition -&gt; skew check
+spark.sparkContext.uiWebUrl                  # Spark UI link</code></pre>
+<table>
+<tr><th>Error / symptom</th><th>Usual cause</th><th>Fix</th></tr>
+<tr><td><code>AnalysisException: cannot resolve 'x'</code></td><td>Typo, wrong alias, column dropped earlier</td><td><code>df.columns</code>, <code>printSchema()</code></td></tr>
+<tr><td><code>Reference 'id' is ambiguous</code></td><td>Join produced duplicate column names</td><td>Join on a string key or alias both sides and select explicitly</td></tr>
+<tr><td><code>java.lang.OutOfMemoryError</code> (executor)</td><td>Skew, huge partitions, <code>collect_list</code></td><td>More partitions, salting, more executor memory</td></tr>
+<tr><td>OOM on driver</td><td><code>collect</code>, <code>toPandas</code>, large broadcast</td><td><code>limit</code>, write out, lower broadcast threshold</td></tr>
+<tr><td><code>Container killed by YARN: memory overhead</code></td><td>Python/Arrow memory beyond JVM heap</td><td>Raise <code>spark.executor.memoryOverhead</code></td></tr>
+<tr><td>One task runs for hours</td><td>Data skew</td><td>AQE skew join, salting, filter NULL keys</td></tr>
+<tr><td><code>Cannot broadcast the table ... exceeds</code></td><td>Broadcast hint on large table</td><td>Remove hint or lower threshold</td></tr>
+<tr><td>Job slow, many tiny tasks</td><td>Too many shuffle partitions / small input files</td><td>Enable AQE coalescing, compact input files</td></tr>
+<tr><td><code>MERGE ... multiple source rows matched</code></td><td>Duplicate keys in source</td><td>Dedupe source with <code>row_number</code> first</td></tr>
+<tr><td>Dates all <code>NULL</code></td><td>Format pattern mismatch</td><td>Check pattern case (<code>MM</code> vs <code>mm</code>)</td></tr>
+<tr><td><code>PythonException</code> in UDF</td><td>Null input or bad type in Python code</td><td>Handle <code>None</code>; test UDF logic as plain Python first</td></tr>
+</table>
+<h3>Spark UI cheat sheet</h3>
+<ul>
+<li><b>Jobs / Stages:</b> which stage is slow? Compare task duration min/median/max.</li>
+<li><b>SQL tab:</b> visual plan with row counts per operator – spot an exploding join.</li>
+<li><b>Storage tab:</b> verify caches exist and fit in memory.</li>
+<li><b>Executors tab:</b> GC time &gt; 10% of task time signals memory pressure.</li>
+</ul>
+</section>
+
+<section id="cheat">
+<h2><span class="n">A</span>Production Checklist &amp; Cheat Sheet</h2>
+<ul>
+<li>✅ Explicit schemas; Parquet/Delta over CSV/JSON after ingestion.</li>
+<li>✅ Filter/select early; check <code>explain()</code> for pushed filters and join strategy.</li>
+<li>✅ Broadcast small dimensions; enable AQE and skew-join handling.</li>
+<li>✅ Right-size <code>spark.sql.shuffle.partitions</code>; avoid tiny output files.</li>
+<li>✅ Prefer built-in functions &gt; <code>pandas_udf</code> &gt; Python UDF.</li>
+<li>✅ Cache only reused data; always <code>unpersist()</code>.</li>
+<li>✅ Make jobs idempotent (dynamic partition overwrite or Delta <code>MERGE</code>).</li>
+<li>✅ Never <code>collect()</code> unbounded data; add data-quality checks (null counts, row counts) between stages.</li>
+</ul>
+<pre data-lang="python"><code># Quick diagnostics
+df.printSchema()
+df.explain("formatted")
+df.rdd.getNumPartitions()
+df.select([F.count(F.when(F.col(c).isNull(), c)).alias(c) for c in df.columns]).show()   # null counts
+df.groupBy("key").count().orderBy(F.desc("count")).show(10)                               # skew check
+df.describe().show()</code></pre>
+</section>
+
+</main>
+</div>
+<footer>PySpark Study Guide · Targets Spark 3.3+ · Verify config defaults against your runtime version.</footer>
+
+<script>
+/* ---------- theme ---------- */
+(function(){
+  var root=document.documentElement,btn=document.getElementById('themeBtn');
+  try{var s=localStorage.getItem('theme');if(s)root.setAttribute('data-theme',s);
+      else if(window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)root.setAttribute('data-theme','light');}catch(e){}
+  btn.addEventListener('click',function(){
+    var n=root.getAttribute('data-theme')==='dark'?'light':'dark';
+    root.setAttribute('data-theme',n);try{localStorage.setItem('theme',n)}catch(e){}
+  });
+})();
+
+/* ---------- lightweight syntax highlighter ---------- */
+(function(){
+  function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+  var PY_KW='and|as|assert|break|class|continue|def|del|elif|else|except|finally|for|from|global|if|import|in|is|lambda|None|nonlocal|not|or|pass|raise|return|True|False|try|while|with|yield';
+  var SQL_KW='SELECT|FROM|WHERE|GROUP|BY|ORDER|JOIN|ON|AS|WITH|OVER|PARTITION|AND|OR|IN|LEFT|RIGHT|INNER|SUM|RANK|DESC|ASC|LIMIT|SHOW|TABLES';
+  var re={
+    python:new RegExp('(#.*)|("""[\\s\\S]*?"""|\'\'\'[\\s\\S]*?\'\'\'|f?"(?:\\\\.|[^"\\\\\\n])*"|f?\'(?:\\\\.|[^\'\\\\\\n])*\')|(@\\w+)|\\b('+PY_KW+')\\b|\\b(\\d[\\d_]*\\.?\\d*)\\b|\\b([A-Za-z_]\\w*)(?=\\()|\\b([A-Z][A-Za-z]+)\\b','g'),
+    bash:/(#.*)|("(?:\\.|[^"\\])*"|'[^']*')|()(--?[a-z][\w-]*)|\b(\d+[a-z]?)\b|()()/g
+  };
+  function hl(code,lang){
+    if(lang==='bash'){
+      return code.split('\n').map(function(l){
+        var h=esc(l);
+        if(/^\s*#/.test(l))return '<span class="c">'+h+'</span>';
+        h=h.replace(/(&quot;.*?&quot;|"[^"]*")/g,'<span class="s">$1</span>');
+        h=h.replace(/(^|\s)(--?[a-zA-Z][\w-]*)/g,'$1<span class="k">$2</span>');
+        h=h.replace(/^(\s*)(spark-submit|pip|python)\b/,'$1<span class="f">$2</span>');
+        return h;
+      }).join('\n');
+    }
+    if(lang==='sql'){
+      var rs=/(--.*)|('(?:[^'\\]|\\.)*')|\b(SELECT|FROM|WHERE|GROUP|BY|ORDER|JOIN|ON|AS|WITH|OVER|PARTITION|AND|OR|NOT|IN|IS|NULL|LEFT|RIGHT|INNER|DESC|ASC|LIMIT|MERGE|INTO|USING|WHEN|MATCHED|THEN|UPDATE|SET|INSERT|DELETE|VALUES|OPTIMIZE|ZORDER|VACUUM|RETAIN|HOURS|DESCRIBE|HISTORY|RESTORE|TABLE|VERSION|CASE|ELSE|END|CAST|TRUE|FALSE|UNION|ALL|DISTINCT|CREATE|REPLACE|VIEW|OF|SOURCE|TARGET)\b|\b(\d+)\b|\b([A-Za-z_]\w*)(?=\()/gi;
+      var o2='',l2=0,x;
+      while((x=rs.exec(code))){
+        o2+=esc(code.slice(l2,x.index));
+        var k2=x[1]?'c':x[2]?'s':x[3]?'k':x[4]?'m':'f';
+        o2+='<span class="'+k2+'">'+esc(x[0])+'</span>';l2=x.index+x[0].length;
+      }
+      return o2+esc(code.slice(l2));
+    }
+    var out='',last=0,m;re.python.lastIndex=0;
+    while((m=re.python.exec(code))){
+      out+=esc(code.slice(last,m.index));
+      var cls=m[1]?'c':m[2]?'s':m[3]?'d':m[4]?'k':m[5]?'m':m[6]?'f':'cl';
+      out+='<span class="'+cls+'">'+esc(m[0])+'</span>';last=m.index+m[0].length;
+    }
+    return out+esc(code.slice(last));
+  }
+  document.querySelectorAll('pre').forEach(function(pre){
+    var c=pre.querySelector('code');if(!c)return;
+    var raw=c.textContent;
+    c.innerHTML=hl(raw,pre.getAttribute('data-lang'));
+    var b=document.createElement('button');b.className='copy';b.type='button';b.textContent='Copy';
+    b.addEventListener('click',function(){
+      var done=function(){b.textContent='Copied!';setTimeout(function(){b.textContent='Copy'},1200)};
+      if(navigator.clipboard)navigator.clipboard.writeText(raw).then(done,done);
+    });
+    pre.appendChild(b);
+  });
+})();
+
+/* ---------- active nav link ---------- */
+(function(){
+  var links=[].slice.call(document.querySelectorAll('#toc a'));
+  var map={};links.forEach(function(a){map[a.getAttribute('href').slice(1)]=a});
+  if(!('IntersectionObserver' in window))return;
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting){links.forEach(function(a){a.classList.remove('active')});
+        var a=map[e.target.id];if(a)a.classList.add('active');}
+    });
+  },{rootMargin:'-20% 0px -70% 0px'});
+  document.querySelectorAll('main section').forEach(function(s){io.observe(s)});
+})();
+</script>
+</body>
+</html>
