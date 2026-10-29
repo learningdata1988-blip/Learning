@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SQL Study Guide &amp; Interview Prep</title>
+<style>
+:root{
+  --bg:#0f172a;--panel:#1e293b;--panel2:#162033;--text:#e2e8f0;--muted:#94a3b8;--border:#334155;
+  --accent:#38bdf8;--accent2:#818cf8;--code-bg:#0b1220;--warn:#f59e0b;--ok:#34d399;
+  --t-kw:#c084fc;--t-str:#86efac;--t-com:#64748b;--t-num:#fbbf24;--t-fn:#38bdf8;
+}
+[data-theme="light"]{
+  --bg:#f8fafc;--panel:#ffffff;--panel2:#f1f5f9;--text:#0f172a;--muted:#475569;--border:#cbd5e1;
+  --accent:#0369a1;--accent2:#4f46e5;--code-bg:#f1f5f9;--warn:#b45309;--ok:#047857;
+  --t-kw:#7e22ce;--t-str:#15803d;--t-com:#64748b;--t-num:#b45309;--t-fn:#0369a1;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.65 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 24px;background:var(--panel);border-bottom:1px solid var(--border)}
+header h1{font-size:1.1rem;margin:0}
+header h1 span{color:var(--accent)}
+button.toggle{background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit;font-size:.85rem}
+.layout{display:grid;grid-template-columns:260px minmax(0,1fr);max-width:1300px;margin:0 auto;gap:32px;padding:24px}
+nav{position:sticky;top:76px;align-self:start;max-height:calc(100vh - 100px);overflow:auto;font-size:.9rem;padding-right:8px}
+nav a{display:block;color:var(--muted);text-decoration:none;padding:4px 10px;border-left:2px solid var(--border)}
+nav a:hover,nav a.active{color:var(--accent);border-left-color:var(--accent)}
+nav a.sub{padding-left:24px;font-size:.85rem}
+nav .mod{margin-top:12px;font-weight:600;color:var(--text);padding:4px 10px;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em}
+main{min-width:0;max-width:900px}
+section{margin-bottom:56px}
+h2{font-size:1.7rem;margin:0 0 6px;padding-bottom:8px;border-bottom:2px solid var(--accent)}
+h2 .n{color:var(--accent2);margin-right:8px}
+h3{font-size:1.2rem;margin:32px 0 8px;color:var(--accent)}
+ul,ol{padding-left:22px}
+code{font-family:"JetBrains Mono","Fira Code",Consolas,monospace;font-size:.88em;background:var(--panel2);border:1px solid var(--border);padding:1px 6px;border-radius:5px}
+pre{position:relative;background:var(--code-bg);border:1px solid var(--border);border-radius:10px;padding:16px;overflow:auto;margin:12px 0 18px}
+pre code{background:none;border:0;padding:0;font-size:.85rem;line-height:1.55;display:block;white-space:pre}
+.copy{position:absolute;top:5px;right:8px;background:var(--panel2);color:var(--muted);border:1px solid var(--border);border-radius:6px;font-size:.7rem;padding:2px 8px;cursor:pointer}
+.k{color:var(--t-kw);font-weight:600}.s{color:var(--t-str)}.c{color:var(--t-com);font-style:italic}.m{color:var(--t-num)}.f{color:var(--t-fn)}
+table{width:100%;border-collapse:collapse;margin:12px 0 20px;font-size:.92rem;display:block;overflow-x:auto}
+th,td{border:1px solid var(--border);padding:8px 12px;text-align:left;vertical-align:top}
+th{background:var(--panel2);color:var(--accent)}
+table.data td,table.data th{padding:4px 10px;font-size:.85rem}
+.callout{border-left:4px solid var(--accent);background:var(--panel);padding:10px 16px;border-radius:0 8px 8px 0;margin:14px 0}
+.callout.warn{border-color:var(--warn)}.callout.tip{border-color:var(--ok)}
+.callout b.t{display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.diagram{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px;font-family:Consolas,monospace;font-size:.82rem;overflow:auto;white-space:pre;color:var(--muted)}
+details{background:var(--panel);border:1px solid var(--border);border-radius:10px;margin:10px 0;padding:0}
+details summary{cursor:pointer;padding:12px 16px;font-weight:600;list-style:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"Q";display:inline-block;background:var(--accent2);color:#fff;border-radius:6px;padding:0 7px;margin-right:10px;font-size:.8rem}
+details[open] summary{border-bottom:1px solid var(--border);color:var(--accent)}
+details .ans{padding:6px 16px 12px}
+.lvl{font-size:.7rem;border:1px solid var(--border);border-radius:10px;padding:1px 8px;margin-left:8px;color:var(--muted);font-weight:400}
+.toolbar{margin:8px 0 16px;display:flex;gap:8px;flex-wrap:wrap}
+footer{text-align:center;color:var(--muted);padding:24px;font-size:.85rem;border-top:1px solid var(--border)}
+@media(max-width:900px){.layout{grid-template-columns:1fr;padding:16px}nav{position:static;max-height:none;border-bottom:1px solid var(--border);padding-bottom:12px}}
+</style>
+</head>
+<body>
+<header>
+  <h1><span>🗄️</span> SQL Study Guide &amp; Interview Prep</h1>
+  <button class="toggle" id="themeBtn" type="button">Toggle light/dark</button>
+</header>
+<div class="layout">
+<nav id="toc">
+  <div class="mod">1 · Foundations</div>
+  <a href="#schema" class="sub">Sample schema</a>
+  <a href="#basics" class="sub">SELECT, filters, NULL</a>
+  <a href="#order" class="sub">Order of execution</a>
+  <div class="mod">2 · Joins &amp; Aggregation</div>
+  <a href="#joins" class="sub">Joins</a>
+  <a href="#agg" class="sub">GROUP BY / HAVING</a>
+  <div class="mod">3 · Advanced SQL</div>
+  <a href="#subq" class="sub">Subqueries &amp; CTEs</a>
+  <a href="#window" class="sub">Window functions</a>
+  <a href="#funcs" class="sub">String, date, CASE</a>
+  <a href="#sets" class="sub">Set operations</a>
+  <div class="mod">4 · DDL / DML</div>
+  <a href="#ddl" class="sub">Tables &amp; constraints</a>
+  <a href="#dml" class="sub">INSERT/UPDATE/MERGE</a>
+  <a href="#txn" class="sub">Transactions &amp; ACID</a>
+  <div class="mod">5 · Design &amp; Performance</div>
+  <a href="#index" class="sub">Indexes &amp; tuning</a>
+  <a href="#design" class="sub">Normalization, DW</a>
+  <div class="mod">Stored Procedures</div>
+  <a href="#proc-concept" class="sub">Overview</a>
+  <a href="#proc-mssql" class="sub">SQL Server (T-SQL)</a>
+  <a href="#proc-oracle" class="sub">Oracle (PL/SQL)</a>
+  <a href="#proc-compare" class="sub">Comparison &amp; Q&amp;A</a>
+  <div class="mod">6 · Interview</div>
+  <a href="#queries" class="sub">Classic query problems</a>
+  <a href="#qa" class="sub">Concept Q&amp;A</a>
+  <a href="#cheat" class="sub">Cheat sheet</a>
+</nav>
+<main>
+
+<!-- ============ 1 FOUNDATIONS ============ -->
+<section id="schema">
+<h2><span class="n">1</span>Sample Schema Used in Examples</h2>
+<p>All queries below use these four tables. Syntax is ANSI/PostgreSQL-style; dialect differences (MySQL, SQL Server, Oracle, Spark SQL) are called out where they matter.</p>
+<table class="data"><tr><th colspan="6">employees</th></tr>
+<tr><th>emp_id</th><th>name</th><th>salary</th><th>dept_id</th><th>manager_id</th><th>hire_date</th></tr>
+<tr><td>1</td><td>Asha</td><td>150000</td><td>10</td><td>NULL</td><td>2019-03-01</td></tr>
+<tr><td>2</td><td>Ben</td><td>90000</td><td>10</td><td>1</td><td>2020-07-15</td></tr>
+<tr><td>3</td><td>Chen</td><td>90000</td><td>20</td><td>1</td><td>2021-01-10</td></tr>
+<tr><td>4</td><td>Dia</td><td>70000</td><td>20</td><td>3</td><td>2022-05-20</td></tr>
+<tr><td>5</td><td>Eli</td><td>120000</td><td>NULL</td><td>1</td><td>2023-02-11</td></tr></table>
+<table class="data"><tr><th colspan="2">departments</th><th colspan="4">customers</th></tr>
+<tr><th>dept_id</th><th>dept_name</th><th>customer_id</th><th>name</th><th>city</th><th>signup_date</th></tr>
+<tr><td>10</td><td>Engineering</td><td>1</td><td>Zed</td><td>Pune</td><td>2024-01-05</td></tr>
+<tr><td>20</td><td>Sales</td><td>2</td><td>Yan</td><td>Dubai</td><td>2024-02-11</td></tr>
+<tr><td>30</td><td>HR</td><td>3</td><td>Xia</td><td>Pune</td><td>2024-03-02</td></tr></table>
+<table class="data"><tr><th colspan="5">orders</th></tr>
+<tr><th>order_id</th><th>customer_id</th><th>order_date</th><th>amount</th><th>status</th></tr>
+<tr><td>100</td><td>1</td><td>2025-01-03</td><td>250.00</td><td>DONE</td></tr>
+<tr><td>101</td><td>1</td><td>2025-02-14</td><td>120.00</td><td>DONE</td></tr>
+<tr><td>102</td><td>2</td><td>2025-02-20</td><td>980.00</td><td>CANCELLED</td></tr>
+<tr><td>103</td><td>2</td><td>2025-03-01</td><td>75.50</td><td>DONE</td></tr></table>
+</section>
+
+<section id="basics">
+<h2><span class="n">1.1</span>SELECT, Filtering, Sorting &amp; NULL</h2>
+<pre><code>-- Basic shape
+SELECT DISTINCT dept_id, salary * 12 AS annual_salary
+FROM   employees
+WHERE  salary &gt;= 80000
+  AND  hire_date BETWEEN '2020-01-01' AND '2022-12-31'
+  AND  name LIKE 'A%'                 -- % any chars, _ one char
+  AND  dept_id IN (10, 20)
+ORDER BY annual_salary DESC, name ASC
+LIMIT 10;                             -- SQL Server: SELECT TOP 10 ... | Oracle: FETCH FIRST 10 ROWS ONLY
+
+-- NULL rules: NULL is "unknown", never equal to anything (even NULL)
+SELECT * FROM employees WHERE manager_id IS NULL;         -- correct
+SELECT * FROM employees WHERE manager_id = NULL;          -- returns nothing!
+SELECT name, COALESCE(dept_id, -1) AS dept FROM employees;   -- first non-null
+SELECT NULLIF(salary, 0) FROM employees;                  -- avoid divide-by-zero
+SELECT name FROM employees WHERE dept_id NOT IN (10, NULL);  -- returns NOTHING (NULL trap)</code></pre>
+<div class="callout warn"><b class="t">NULL traps</b><code>NOT IN</code> with a NULL in the list returns no rows – use <code>NOT EXISTS</code> instead. <code>COUNT(col)</code> ignores NULLs; <code>COUNT(*)</code> does not. Aggregates (SUM/AVG/MAX) ignore NULLs. Comparison with NULL yields UNKNOWN, which <code>WHERE</code> treats as false.</div>
+<table>
+<tr><th>Category</th><th>Commands</th><th>Purpose</th></tr>
+<tr><td>DQL</td><td>SELECT</td><td>Query data</td></tr>
+<tr><td>DML</td><td>INSERT, UPDATE, DELETE, MERGE</td><td>Change data</td></tr>
+<tr><td>DDL</td><td>CREATE, ALTER, DROP, TRUNCATE</td><td>Change structure</td></tr>
+<tr><td>DCL</td><td>GRANT, REVOKE</td><td>Permissions</td></tr>
+<tr><td>TCL</td><td>COMMIT, ROLLBACK, SAVEPOINT</td><td>Transactions</td></tr>
+</table>
+</section>
+
+<section id="order">
+<h2><span class="n">1.2</span>Logical Order of Execution</h2>
+<p>SQL is written <code>SELECT → FROM</code> but evaluated in a different order. This explains why you can't use a <code>SELECT</code> alias in <code>WHERE</code>.</p>
+<div class="diagram">1. FROM / JOIN      build the row source
+2. WHERE            filter rows (no aggregates, no select aliases)
+3. GROUP BY         form groups
+4. HAVING           filter groups (aggregates allowed)
+5. SELECT           compute expressions, window functions, aliases
+6. DISTINCT         remove duplicates
+7. ORDER BY         sort (can use aliases)
+8. LIMIT / TOP      trim result</div>
+</section>
+
+<!-- ============ 2 JOINS ============ -->
+<section id="joins">
+<h2><span class="n">2</span>Joins</h2>
+<table>
+<tr><th>Join</th><th>Returns</th></tr>
+<tr><td><code>INNER JOIN</code></td><td>Only rows with a match in both tables</td></tr>
+<tr><td><code>LEFT JOIN</code></td><td>All left rows + matches (NULL where none)</td></tr>
+<tr><td><code>RIGHT JOIN</code></td><td>All right rows + matches</td></tr>
+<tr><td><code>FULL OUTER JOIN</code></td><td>All rows from both; NULLs where unmatched (not in MySQL)</td></tr>
+<tr><td><code>CROSS JOIN</code></td><td>Cartesian product (m × n rows)</td></tr>
+<tr><td>Self join</td><td>Table joined to itself (hierarchies, comparisons)</td></tr>
+<tr><td>Semi / Anti</td><td><code>EXISTS</code> / <code>NOT EXISTS</code> (or Spark <code>LEFT SEMI/ANTI JOIN</code>)</td></tr>
+</table>
+<pre><code>-- Inner: employees with their department name
+SELECT e.name, d.dept_name
+FROM   employees e
+JOIN   departments d ON d.dept_id = e.dept_id;          -- Eli (NULL dept) is dropped
+
+-- Left: keep everyone, even without a department
+SELECT e.name, d.dept_name
+FROM   employees e
+LEFT JOIN departments d ON d.dept_id = e.dept_id;
+
+-- Anti join: departments with no employees (HR)
+SELECT d.*
+FROM   departments d
+LEFT JOIN employees e ON e.dept_id = d.dept_id
+WHERE  e.emp_id IS NULL;
+
+-- Self join: employee with manager name
+SELECT e.name AS employee, m.name AS manager
+FROM   employees e
+LEFT JOIN employees m ON m.emp_id = e.manager_id;
+
+-- Full outer: reconcile two sources
+SELECT COALESCE(a.id, b.id) AS id, a.val AS a_val, b.val AS b_val
+FROM   src_a a FULL OUTER JOIN src_b b ON a.id = b.id
+WHERE  a.id IS NULL OR b.id IS NULL OR a.val &lt;&gt; b.val;</code></pre>
+<div class="callout warn"><b class="t">LEFT JOIN trap</b>A filter on the right table in <code>WHERE</code> silently turns a LEFT JOIN into an INNER JOIN. Put it in the <code>ON</code> clause instead: <code>LEFT JOIN orders o ON o.customer_id = c.customer_id AND o.status = 'DONE'</code>.</div>
+<div class="callout"><b class="t">Join fan-out</b>Joining on a non-unique key multiplies rows and inflates <code>SUM</code>/<code>COUNT</code>. Check cardinality (1:1, 1:N, M:N) before joining, and aggregate before joining when needed.</div>
+</section>
+
+<section id="agg">
+<h2><span class="n">2.1</span>Aggregation: GROUP BY &amp; HAVING</h2>
+<pre><code>SELECT   dept_id,
+         COUNT(*)              AS headcount,
+         COUNT(manager_id)     AS with_manager,       -- ignores NULLs
+         COUNT(DISTINCT salary) AS distinct_salaries,
+         SUM(salary)           AS payroll,
+         AVG(salary)           AS avg_salary,
+         MIN(hire_date)        AS first_hire,
+         MAX(salary)           AS top_salary
+FROM     employees
+WHERE    hire_date &gt;= '2020-01-01'      -- filters ROWS before grouping
+GROUP BY dept_id
+HAVING   COUNT(*) &gt; 1                  -- filters GROUPS after aggregation
+ORDER BY payroll DESC;
+
+-- Conditional aggregation (pivot-style)
+SELECT customer_id,
+       SUM(CASE WHEN status = 'DONE'      THEN amount ELSE 0 END) AS done_amt,
+       SUM(CASE WHEN status = 'CANCELLED' THEN amount ELSE 0 END) AS cancelled_amt,
+       COUNT(*) FILTER (WHERE status = 'DONE') AS done_orders   -- PostgreSQL / Spark; else use CASE
+FROM   orders
+GROUP BY customer_id;
+
+-- Subtotals
+SELECT dept_id, manager_id, SUM(salary) FROM employees GROUP BY ROLLUP (dept_id, manager_id);
+-- also CUBE (...) and GROUPING SETS ((a),(b),())</code></pre>
+<div class="callout tip"><b class="t">Rule</b>Every non-aggregated column in <code>SELECT</code> must appear in <code>GROUP BY</code> (MySQL may allow otherwise, but results are undefined).</div>
+</section>
+
+<!-- ============ 3 ADVANCED ============ -->
+<section id="subq">
+<h2><span class="n">3</span>Subqueries &amp; CTEs</h2>
+<pre><code>-- Scalar subquery
+SELECT name, salary, salary - (SELECT AVG(salary) FROM employees) AS diff_from_avg
+FROM employees;
+
+-- IN / EXISTS (EXISTS short-circuits and is NULL-safe)
+SELECT * FROM customers c
+WHERE EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = c.customer_id AND o.status = 'DONE');
+
+-- Correlated subquery: employees paid above their department average
+SELECT e.name, e.salary
+FROM   employees e
+WHERE  e.salary &gt; (SELECT AVG(salary) FROM employees WHERE dept_id = e.dept_id);
+
+-- Derived table
+SELECT dept_id, avg_sal FROM (SELECT dept_id, AVG(salary) AS avg_sal FROM employees GROUP BY dept_id) t
+WHERE avg_sal &gt; 80000;
+
+-- CTE: readable, reusable within one statement
+WITH dept_avg AS (
+    SELECT dept_id, AVG(salary) AS avg_sal FROM employees GROUP BY dept_id
+), high AS (
+    SELECT e.* FROM employees e JOIN dept_avg d USING (dept_id) WHERE e.salary &gt; d.avg_sal
+)
+SELECT * FROM high;
+
+-- Recursive CTE: org chart / hierarchy
+WITH RECURSIVE org AS (
+    SELECT emp_id, name, manager_id, 1 AS lvl FROM employees WHERE manager_id IS NULL   -- anchor
+    UNION ALL
+    SELECT e.emp_id, e.name, e.manager_id, o.lvl + 1
+    FROM   employees e JOIN org o ON e.manager_id = o.emp_id                          -- recursion
+)
+SELECT * FROM org ORDER BY lvl;       -- SQL Server / Oracle: omit the word RECURSIVE</code></pre>
+<table>
+<tr><th></th><th>Subquery</th><th>CTE</th><th>Temp table</th></tr>
+<tr><td>Scope</td><td>One spot in a query</td><td>One statement</td><td>Session</td></tr>
+<tr><td>Reuse</td><td>No</td><td>Multiple references (may re-execute)</td><td>Yes, and can be indexed</td></tr>
+<tr><td>Use for</td><td>Simple filters</td><td>Readability, recursion</td><td>Large intermediate results</td></tr>
+</table>
+</section>
+
+<section id="window">
+<h2><span class="n">3.1</span>Window Functions</h2>
+<p>Windows compute over a set of related rows <b>without collapsing</b> them. Syntax: <code>func() OVER (PARTITION BY … ORDER BY … frame)</code>.</p>
+<pre><code>SELECT name, dept_id, salary,
+       ROW_NUMBER() OVER w AS rn,         -- 1,2,3,4  unique
+       RANK()       OVER w AS rnk,        -- 1,1,3,4  gaps after ties
+       DENSE_RANK() OVER w AS drnk,       -- 1,1,2,3  no gaps
+       NTILE(4)     OVER w AS quartile,
+       LAG(salary)  OVER (PARTITION BY dept_id ORDER BY hire_date)     AS prev_salary,
+       LEAD(salary, 1, 0) OVER (PARTITION BY dept_id ORDER BY hire_date) AS next_salary,
+       FIRST_VALUE(name) OVER w AS top_earner,
+       SUM(salary) OVER (PARTITION BY dept_id)                          AS dept_total,
+       salary * 1.0 / SUM(salary) OVER (PARTITION BY dept_id)           AS pct_of_dept
+FROM employees
+WINDOW w AS (PARTITION BY dept_id ORDER BY salary DESC);     -- named window (not in SQL Server)
+
+-- Running total and moving average (frames)
+SELECT order_date, amount,
+       SUM(amount) OVER (ORDER BY order_date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total,
+       AVG(amount) OVER (ORDER BY order_date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW)         AS moving_avg_7
+FROM orders;</code></pre>
+<div class="callout warn"><b class="t">Remember</b>Window functions run after <code>WHERE/GROUP BY/HAVING</code>, so you can't filter on them directly. Wrap in a CTE/subquery: <code>WITH r AS (SELECT …, ROW_NUMBER() OVER … rn FROM t) SELECT * FROM r WHERE rn = 1</code>. (Snowflake/BigQuery/Databricks also support <code>QUALIFY</code>.) With <code>ORDER BY</code> and no frame, the default frame is <code>RANGE UNBOUNDED PRECEDING … CURRENT ROW</code> – ties get the same running total.</div>
+</section>
+
+<section id="funcs">
+<h2><span class="n">3.2</span>String, Date &amp; CASE Functions</h2>
+<pre><code>-- CASE
+SELECT name,
+       CASE WHEN salary &gt;= 120000 THEN 'High'
+            WHEN salary &gt;=  80000 THEN 'Mid'
+            ELSE 'Low' END AS band
+FROM employees;
+
+-- Strings (PostgreSQL / standard-ish)
+SELECT UPPER(name), LOWER(name), LENGTH(name), TRIM('  x  '),
+       SUBSTRING(name FROM 1 FOR 3),      -- MySQL/SQL Server: SUBSTRING(name,1,3)
+       CONCAT(name, '-', dept_id),        -- or name || '-' || dept_id
+       REPLACE(name, 'a', '@'),
+       POSITION('s' IN name),             -- SQL Server: CHARINDEX('s', name)
+       LEFT(name, 2), RIGHT(name, 2),
+       STRING_AGG(name, ', ')             -- MySQL: GROUP_CONCAT(name SEPARATOR ', ')
+FROM employees GROUP BY name;
+
+-- Dates (PostgreSQL)
+SELECT CURRENT_DATE, NOW(),
+       EXTRACT(YEAR FROM hire_date)  AS yr,
+       DATE_TRUNC('month', hire_date) AS month_start,
+       hire_date + INTERVAL '30 days' AS plus_30,
+       CURRENT_DATE - hire_date       AS days_employed,     -- integer days
+       TO_CHAR(hire_date, 'YYYY-MM')  AS ym
+FROM employees;
+-- MySQL: DATE_ADD(d, INTERVAL 30 DAY), DATEDIFF(a,b), DATE_FORMAT(d,'%Y-%m')
+-- SQL Server: DATEADD(day,30,d), DATEDIFF(day,a,b), FORMAT(d,'yyyy-MM'), EOMONTH(d)
+-- Spark SQL: date_add(d,30), datediff(a,b), date_format(d,'yyyy-MM'), trunc(d,'MM')</code></pre>
+</section>
+
+<section id="sets">
+<h2><span class="n">3.3</span>Set Operations</h2>
+<table>
+<tr><th>Operator</th><th>Result</th><th>Notes</th></tr>
+<tr><td><code>UNION</code></td><td>Combined, duplicates removed</td><td>Sorts/dedups – slower</td></tr>
+<tr><td><code>UNION ALL</code></td><td>Combined, duplicates kept</td><td>Faster; prefer when duplicates are impossible or fine</td></tr>
+<tr><td><code>INTERSECT</code></td><td>Rows in both</td><td>Not in MySQL &lt; 8.0.31</td></tr>
+<tr><td><code>EXCEPT</code> / <code>MINUS</code></td><td>Rows in first not in second</td><td>Oracle uses MINUS</td></tr>
+</table>
+<p>Rules: same number of columns, compatible types, column names come from the first query.</p>
+<pre><code>SELECT customer_id FROM orders WHERE order_date &gt;= '2025-02-01' AND order_date &lt; '2025-03-01'
+INTERSECT
+SELECT customer_id FROM orders WHERE order_date &gt;= '2025-03-01' AND order_date &lt; '2025-04-01';   -- ordered in Feb AND Mar</code></pre>
+</section>
+
+<!-- ============ 4 DDL / DML ============ -->
+<section id="ddl">
+<h2><span class="n">4</span>DDL: Tables &amp; Constraints</h2>
+<pre><code>CREATE TABLE departments (
+    dept_id    INT          PRIMARY KEY,
+    dept_name  VARCHAR(50)  NOT NULL UNIQUE
+);
+
+CREATE TABLE employees (
+    emp_id      INT           PRIMARY KEY,
+    name        VARCHAR(100)  NOT NULL,
+    salary      DECIMAL(12,2) CHECK (salary &gt; 0),
+    dept_id     INT           REFERENCES departments (dept_id) ON DELETE SET NULL,
+    manager_id  INT           REFERENCES employees (emp_id),
+    hire_date   DATE          DEFAULT CURRENT_DATE,
+    email       VARCHAR(150)  UNIQUE
+);
+
+ALTER TABLE employees ADD COLUMN phone VARCHAR(20);
+ALTER TABLE employees DROP COLUMN phone;
+ALTER TABLE employees ALTER COLUMN salary TYPE DECIMAL(14,2);     -- SQL Server: ALTER COLUMN salary DECIMAL(14,2)
+
+CREATE VIEW v_dept_payroll AS SELECT dept_id, SUM(salary) AS payroll FROM employees GROUP BY dept_id;
+CREATE TABLE emp_backup AS SELECT * FROM employees;               -- SQL Server: SELECT * INTO emp_backup FROM employees
+TRUNCATE TABLE emp_backup;      -- fast, removes all rows, resets identity (DDL-like)
+DROP TABLE emp_backup;          -- removes table and data</code></pre>
+<table>
+<tr><th>Constraint</th><th>Guarantees</th></tr>
+<tr><td>PRIMARY KEY</td><td>Unique + NOT NULL; one per table; identifies a row</td></tr>
+<tr><td>FOREIGN KEY</td><td>Value must exist in the parent table (referential integrity)</td></tr>
+<tr><td>UNIQUE</td><td>No duplicates (NULLs allowed – count varies by DB)</td></tr>
+<tr><td>NOT NULL / CHECK / DEFAULT</td><td>Presence, business rule, fallback value</td></tr>
+</table>
+</section>
+
+<section id="dml">
+<h2><span class="n">4.1</span>DML: INSERT, UPDATE, DELETE, MERGE (Upsert)</h2>
+<pre><code>INSERT INTO departments (dept_id, dept_name) VALUES (40, 'Finance'), (50, 'Legal');
+INSERT INTO emp_backup SELECT * FROM employees WHERE dept_id = 10;
+
+UPDATE employees SET salary = salary * 1.10 WHERE dept_id = 20;
+-- Update using another table (PostgreSQL)
+UPDATE employees e SET salary = s.new_salary FROM salary_changes s WHERE s.emp_id = e.emp_id;
+-- (MySQL: UPDATE employees e JOIN salary_changes s ON ... SET e.salary = s.new_salary)
+
+DELETE FROM employees WHERE hire_date &lt; '2019-01-01';
+
+-- Upsert – standard MERGE (SQL Server, Oracle, Snowflake, Databricks, PostgreSQL 15+)
+MERGE INTO employees AS t
+USING staging_employees AS s ON t.emp_id = s.emp_id
+WHEN MATCHED AND t.salary &lt;&gt; s.salary THEN UPDATE SET salary = s.salary
+WHEN NOT MATCHED THEN INSERT (emp_id, name, salary) VALUES (s.emp_id, s.name, s.salary);
+
+-- PostgreSQL:  INSERT ... ON CONFLICT (emp_id) DO UPDATE SET salary = EXCLUDED.salary;
+-- MySQL:       INSERT ... ON DUPLICATE KEY UPDATE salary = VALUES(salary);</code></pre>
+<table>
+<tr><th></th><th>DELETE</th><th>TRUNCATE</th><th>DROP</th></tr>
+<tr><td>Removes</td><td>Chosen rows</td><td>All rows</td><td>Table itself</td></tr>
+<tr><td>WHERE clause</td><td>Yes</td><td>No</td><td>No</td></tr>
+<tr><td>Rollback</td><td>Yes</td><td>Depends on DB (yes in PostgreSQL/SQL Server in a txn)</td><td>Depends</td></tr>
+<tr><td>Speed / logging</td><td>Slow, row-level log</td><td>Fast, minimal log</td><td>Fast</td></tr>
+<tr><td>Triggers</td><td>Fire</td><td>Don't fire</td><td>–</td></tr>
+</table>
+</section>
+
+<section id="txn">
+<h2><span class="n">4.2</span>Transactions, ACID &amp; Isolation</h2>
+<pre><code>BEGIN;                                          -- START TRANSACTION in MySQL
+  UPDATE accounts SET balance = balance - 500 WHERE id = 1;
+  UPDATE accounts SET balance = balance + 500 WHERE id = 2;
+  -- SAVEPOINT sp1;  ... ROLLBACK TO sp1;
+COMMIT;                                         -- or ROLLBACK; on error</code></pre>
+<table>
+<tr><th>ACID</th><th>Meaning</th></tr>
+<tr><td>Atomicity</td><td>All statements succeed or none do</td></tr>
+<tr><td>Consistency</td><td>Constraints hold before and after</td></tr>
+<tr><td>Isolation</td><td>Concurrent transactions don't see each other's partial work</td></tr>
+<tr><td>Durability</td><td>Committed data survives crashes</td></tr>
+</table>
+<table>
+<tr><th>Isolation level</th><th>Dirty read</th><th>Non-repeatable read</th><th>Phantom read</th></tr>
+<tr><td>READ UNCOMMITTED</td><td>Possible</td><td>Possible</td><td>Possible</td></tr>
+<tr><td>READ COMMITTED (common default)</td><td>No</td><td>Possible</td><td>Possible</td></tr>
+<tr><td>REPEATABLE READ</td><td>No</td><td>No</td><td>Possible (not in PostgreSQL/InnoDB with MVCC)</td></tr>
+<tr><td>SERIALIZABLE</td><td>No</td><td>No</td><td>No</td></tr>
+</table>
+</section>
+
+<!-- ============ 5 DESIGN & PERF ============ -->
+<section id="index">
+<h2><span class="n">5</span>Indexes &amp; Query Performance</h2>
+<pre><code>CREATE INDEX idx_orders_cust_date ON orders (customer_id, order_date);   -- composite: leftmost-prefix rule
+CREATE UNIQUE INDEX uq_emp_email ON employees (email);
+
+EXPLAIN SELECT * FROM orders WHERE customer_id = 1;            -- plan only
+EXPLAIN ANALYZE SELECT * FROM orders WHERE customer_id = 1;    -- executes + real timings (PostgreSQL)</code></pre>
+<h3>Index types</h3>
+<ul>
+<li><b>Clustered</b> (SQL Server/InnoDB): table rows are physically stored in index order – one per table (usually the PK).</li>
+<li><b>Non-clustered / secondary:</b> separate B-tree pointing to rows – many per table.</li>
+<li><b>Covering index:</b> contains all columns a query needs (index-only scan).</li>
+<li>Others: hash, bitmap, full-text, partial/filtered, columnstore.</li>
+</ul>
+<h3>Writing index-friendly (SARGable) queries</h3>
+<pre><code>-- BAD: function on the indexed column blocks the index
+WHERE YEAR(order_date) = 2025
+WHERE UPPER(name) = 'ASHA'
+WHERE amount + 10 &gt; 100
+WHERE name LIKE '%sha'                    -- leading wildcard
+
+-- GOOD
+WHERE order_date &gt;= '2025-01-01' AND order_date &lt; '2026-01-01'
+WHERE name = 'Asha'                       -- or a functional index on UPPER(name)
+WHERE amount &gt; 90
+WHERE name LIKE 'As%'</code></pre>
+<div class="callout tip"><b class="t">Slow query checklist</b>
+<ol>
+<li>Read the plan (<code>EXPLAIN</code>): look for full table scans, big sorts, nested loops over large sets.</li>
+<li>Select only needed columns; avoid <code>SELECT *</code>.</li>
+<li>Filter early; make predicates SARGable; check data types match (implicit casts kill indexes).</li>
+<li>Index join and filter columns (but every index slows writes).</li>
+<li>Replace correlated subqueries with joins/windows; prefer <code>EXISTS</code> over <code>IN</code> for large sets; <code>UNION ALL</code> over <code>UNION</code>.</li>
+<li>Update statistics, consider partitioning for huge tables, paginate with keyset instead of big <code>OFFSET</code>.</li>
+</ol></div>
+</section>
+
+<section id="design">
+<h2><span class="n">5.1</span>Normalization &amp; Data Warehouse Basics</h2>
+<table>
+<tr><th>Form</th><th>Rule</th></tr>
+<tr><td>1NF</td><td>Atomic values; no repeating groups or comma-separated lists</td></tr>
+<tr><td>2NF</td><td>1NF + no partial dependency on part of a composite key</td></tr>
+<tr><td>3NF</td><td>2NF + no transitive dependency (non-key column depending on another non-key column)</td></tr>
+<tr><td>BCNF</td><td>Every determinant is a candidate key</td></tr>
+</table>
+<p><b>OLTP</b> = normalized, many small writes. <b>OLAP/DWH</b> = denormalized <b>star schema</b>: a central <i>fact</i> table (measures + foreign keys) surrounded by <i>dimension</i> tables (descriptive attributes). <b>Snowflake schema</b> normalizes the dimensions further.</p>
+<p><b>Slowly Changing Dimensions:</b> Type 1 overwrites the value (no history); Type 2 adds a new row with <code>effective_from/to</code> and <code>is_current</code> (full history); Type 3 keeps a previous-value column.</p>
+</section>
+
+<!-- ============ STORED PROCEDURES ============ -->
+<section id="proc-concept">
+<h2><span class="n">5.2</span>Stored Procedures: Overview</h2>
+<p>A <b>stored procedure</b> is a named, precompiled block of SQL and procedural code saved in the database. You call it by name with parameters. Typical uses: ETL/batch steps, business rules that must run next to the data, controlled data access (grant <code>EXECUTE</code> without table access), and reducing round trips.</p>
+<table>
+<tr><th>Benefit</th><th>Trade-off</th></tr>
+<tr><td>Fewer network round trips; plan caching and reuse</td><td>Business logic lives in the DB – harder to version, test and debug</td></tr>
+<tr><td>Security: grant EXECUTE only, helps prevent SQL injection when parameterized</td><td>Vendor-specific syntax (T-SQL vs PL/SQL) – poor portability</td></tr>
+<tr><td>Centralized logic reused by many apps; atomic multi-statement transactions</td><td>Row-by-row cursor loops are slow – prefer set-based SQL</td></tr>
+</table>
+<table>
+<tr><th></th><th>Procedure</th><th>Function</th></tr>
+<tr><td>Returns</td><td>Optional; via OUT params, result sets, return code</td><td>Must return a value (scalar or table)</td></tr>
+<tr><td>Use in SELECT</td><td>No</td><td>Yes</td></tr>
+<tr><td>DML / transactions</td><td>Yes</td><td>Restricted (SQL Server: no side-effecting DML; Oracle: limited in SQL context)</td></tr>
+<tr><td>Called with</td><td><code>EXEC</code> / <code>CALL</code></td><td>Inside queries or expressions</td></tr>
+</table>
+</section>
+
+<section id="proc-mssql">
+<h2><span class="n">5.3</span>Stored Procedures in SQL Server (T-SQL)</h2>
+<h3>1. Basic procedure with parameters</h3>
+<pre><code>CREATE OR ALTER PROCEDURE dbo.usp_GetEmployeesByDept     -- CREATE OR ALTER: SQL Server 2016 SP1+
+    @DeptId    INT,
+    @MinSalary DECIMAL(12,2) = 0                         -- default value makes it optional
+AS
+BEGIN
+    SET NOCOUNT ON;                                      -- suppress "n rows affected" chatter
+
+    SELECT emp_id, name, salary, hire_date
+    FROM   dbo.employees
+    WHERE  dept_id = @DeptId
+      AND  salary &gt;= @MinSalary
+    ORDER BY salary DESC;
+END
+GO
+
+EXEC dbo.usp_GetEmployeesByDept @DeptId = 10;                        -- named params (preferred)
+EXEC dbo.usp_GetEmployeesByDept 20, 80000;                           -- positional</code></pre>
+<h3>2. OUTPUT parameters and return codes</h3>
+<pre><code>CREATE OR ALTER PROCEDURE dbo.usp_GetDeptStats
+    @DeptId     INT,
+    @Headcount  INT           OUTPUT,
+    @AvgSalary  DECIMAL(12,2) OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT @Headcount = COUNT(*), @AvgSalary = AVG(salary)
+    FROM   dbo.employees WHERE dept_id = @DeptId;
+
+    IF @Headcount = 0 RETURN -1;       -- RETURN gives an INTEGER status code only
+    RETURN 0;
+END
+GO
+
+DECLARE @cnt INT, @avg DECIMAL(12,2), @rc INT;
+EXEC @rc = dbo.usp_GetDeptStats @DeptId = 10, @Headcount = @cnt OUTPUT, @AvgSalary = @avg OUTPUT;
+SELECT @rc AS return_code, @cnt AS headcount, @avg AS avg_salary;</code></pre>
+<h3>3. Transaction + TRY…CATCH error handling (production template)</h3>
+<pre><code>CREATE OR ALTER PROCEDURE dbo.usp_TransferSalaryBudget
+    @FromDept INT, @ToDept INT, @Amount DECIMAL(12,2)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON;                                   -- any runtime error rolls back the whole txn
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        UPDATE dbo.dept_budget SET budget = budget - @Amount WHERE dept_id = @FromDept;
+        IF @@ROWCOUNT = 0 THROW 50001, 'Source department not found.', 1;
+
+        UPDATE dbo.dept_budget SET budget = budget + @Amount WHERE dept_id = @ToDept;
+        IF @@ROWCOUNT = 0 THROW 50002, 'Target department not found.', 1;
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT &gt; 0 ROLLBACK TRANSACTION;
+
+        INSERT INTO dbo.error_log (proc_name, err_no, err_msg, err_line, logged_at)
+        VALUES (ERROR_PROCEDURE(), ERROR_NUMBER(), ERROR_MESSAGE(), ERROR_LINE(), SYSDATETIME());
+
+        THROW;                                           -- re-raise to the caller
+    END CATCH
+END
+GO</code></pre>
+<h3>4. Upsert procedure (insert or update)</h3>
+<pre><code>CREATE OR ALTER PROCEDURE dbo.usp_UpsertEmployee
+    @EmpId INT, @Name NVARCHAR(100), @Salary DECIMAL(12,2), @DeptId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRY
+        BEGIN TRAN;
+        MERGE dbo.employees AS t
+        USING (SELECT @EmpId AS emp_id, @Name AS name, @Salary AS salary, @DeptId AS dept_id) AS s
+           ON t.emp_id = s.emp_id
+        WHEN MATCHED THEN UPDATE SET name = s.name, salary = s.salary, dept_id = s.dept_id
+        WHEN NOT MATCHED THEN INSERT (emp_id, name, salary, dept_id) VALUES (s.emp_id, s.name, s.salary, s.dept_id);
+        COMMIT;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT &gt; 0 ROLLBACK;
+        THROW;
+    END CATCH
+END
+GO</code></pre>
+<h3>5. Control flow, temp tables, loops</h3>
+<pre><code>CREATE OR ALTER PROCEDURE dbo.usp_GiveRaises @Pct DECIMAL(5,2)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @updated INT = 0;
+
+    IF @Pct &lt;= 0 OR @Pct &gt; 50
+    BEGIN
+        RAISERROR('Raise percentage out of range.', 16, 1);   -- or THROW 50003, '...', 1;
+        RETURN;
+    END
+
+    CREATE TABLE #raised (emp_id INT, old_salary DECIMAL(12,2), new_salary DECIMAL(12,2));   -- temp table, session scoped
+
+    UPDATE e
+       SET salary = salary * (1 + @Pct / 100.0)
+    OUTPUT inserted.emp_id, deleted.salary, inserted.salary INTO #raised     -- capture changes
+    FROM dbo.employees e
+    WHERE e.dept_id IS NOT NULL;
+
+    SET @updated = @@ROWCOUNT;
+
+    SELECT @updated AS rows_updated;
+    SELECT TOP 5 * FROM #raised ORDER BY new_salary DESC;
+    DROP TABLE #raised;
+END
+GO
+
+-- WHILE loop (use sparingly; set-based is usually better)
+DECLARE @i INT = 1;
+WHILE @i &lt;= 3 BEGIN PRINT CONCAT('Iteration ', @i); SET @i += 1; END</code></pre>
+<h3>6. Dynamic SQL (safe, parameterized)</h3>
+<pre><code>CREATE OR ALTER PROCEDURE dbo.usp_SearchEmployees
+    @SortColumn SYSNAME = 'name', @MinSalary DECIMAL(12,2) = 0
+AS
+BEGIN
+    SET NOCOUNT ON;
+    -- Whitelist identifiers: they can't be parameterized
+    IF @SortColumn NOT IN ('name', 'salary', 'hire_date') THROW 50010, 'Invalid sort column', 1;
+
+    DECLARE @sql NVARCHAR(MAX) =
+        N'SELECT emp_id, name, salary FROM dbo.employees WHERE salary &gt;= @p_min ORDER BY ' + QUOTENAME(@SortColumn);
+
+    EXEC sys.sp_executesql @sql, N'@p_min DECIMAL(12,2)', @p_min = @MinSalary;   -- values stay parameters
+END
+GO</code></pre>
+<h3>7. Cursor (row-by-row) and table-valued parameter</h3>
+<pre><code>-- Cursor: only when logic truly can't be set-based
+DECLARE @id INT, @name NVARCHAR(100);
+DECLARE c CURSOR LOCAL FAST_FORWARD FOR SELECT emp_id, name FROM dbo.employees;
+OPEN c;
+FETCH NEXT FROM c INTO @id, @name;
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    PRINT CONCAT(@id, ' - ', @name);
+    FETCH NEXT FROM c INTO @id, @name;
+END
+CLOSE c; DEALLOCATE c;
+
+-- Table-valued parameter: pass many rows in one call
+CREATE TYPE dbo.EmpIdList AS TABLE (emp_id INT PRIMARY KEY);
+GO
+CREATE OR ALTER PROCEDURE dbo.usp_GetEmployeesByIds @Ids dbo.EmpIdList READONLY
+AS
+    SELECT e.* FROM dbo.employees e JOIN @Ids i ON i.emp_id = e.emp_id;
+GO
+DECLARE @list dbo.EmpIdList; INSERT INTO @list VALUES (1),(3),(5);
+EXEC dbo.usp_GetEmployeesByIds @Ids = @list;</code></pre>
+<h3>8. Manage and grant</h3>
+<pre><code>EXEC sp_helptext 'dbo.usp_GetEmployeesByDept';          -- view definition
+DROP PROCEDURE IF EXISTS dbo.usp_GetEmployeesByDept;
+GRANT EXECUTE ON dbo.usp_GetEmployeesByDept TO reporting_role;
+
+-- Capture a procedure's result set into a table
+INSERT INTO #results EXEC dbo.usp_GetEmployeesByDept @DeptId = 10;</code></pre>
+<div class="callout tip"><b class="t">T-SQL best practices</b>Always <code>SET NOCOUNT ON</code>; schema-qualify objects (<code>dbo.</code>); use <code>XACT_ABORT ON</code> with <code>TRY/CATCH</code>; name procedures consistently (<code>usp_</code>, never <code>sp_</code> – that prefix is searched in <code>master</code> first); avoid <code>SELECT *</code>; beware <b>parameter sniffing</b> (use <code>OPTION (RECOMPILE)</code> or <code>OPTIMIZE FOR</code> when plans vary wildly by parameter).</div>
+</section>
+
+<section id="proc-oracle">
+<h2><span class="n">5.4</span>Stored Procedures in Oracle (PL/SQL)</h2>
+<h3>1. Basic procedure with IN / OUT parameters</h3>
+<pre><code>CREATE OR REPLACE PROCEDURE get_dept_stats (
+    p_dept_id   IN  employees.dept_id%TYPE,          -- %TYPE copies the column's data type
+    p_headcount OUT NUMBER,
+    p_avg_sal   OUT NUMBER
+)
+IS                                                    -- declaration section (IS or AS)
+    v_max_sal employees.salary%TYPE;
+BEGIN
+    SELECT COUNT(*), AVG(salary), MAX(salary)
+    INTO   p_headcount, p_avg_sal, v_max_sal
+    FROM   employees
+    WHERE  dept_id = p_dept_id;
+
+    DBMS_OUTPUT.PUT_LINE('Dept ' || p_dept_id || ' max salary: ' || v_max_sal);
+END get_dept_stats;
+/
+
+-- Call it from an anonymous block (or SQL*Plus: EXEC procedure_name(...))
+SET SERVEROUTPUT ON
+DECLARE
+    v_cnt NUMBER; v_avg NUMBER;
+BEGIN
+    get_dept_stats(10, v_cnt, v_avg);
+    DBMS_OUTPUT.PUT_LINE('Headcount=' || v_cnt || ', avg=' || ROUND(v_avg, 2));
+    get_dept_stats(p_dept_id =&gt; 20, p_headcount =&gt; v_cnt, p_avg_sal =&gt; v_avg);   -- named notation
+END;
+/</code></pre>
+<div class="callout"><b class="t">Parameter modes</b><code>IN</code> (default, read-only), <code>OUT</code> (returns a value), <code>IN OUT</code> (passed in and modified). Add <code>DEFAULT</code> to make a parameter optional. The trailing <code>/</code> on its own line executes the block in SQL*Plus / SQL Developer scripts.</div>
+
+<h3>2. Exception handling and transactions</h3>
+<pre><code>CREATE OR REPLACE PROCEDURE transfer_budget (
+    p_from IN NUMBER, p_to IN NUMBER, p_amount IN NUMBER
+)
+IS
+    e_insufficient EXCEPTION;
+    PRAGMA EXCEPTION_INIT(e_insufficient, -20001);
+    v_balance dept_budget.budget%TYPE;
+BEGIN
+    SELECT budget INTO v_balance FROM dept_budget WHERE dept_id = p_from FOR UPDATE;   -- lock the row
+
+    IF v_balance &lt; p_amount THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Insufficient budget in department ' || p_from);   -- -20000..-20999
+    END IF;
+
+    UPDATE dept_budget SET budget = budget - p_amount WHERE dept_id = p_from;
+    UPDATE dept_budget SET budget = budget + p_amount WHERE dept_id = p_to;
+
+    IF SQL%ROWCOUNT = 0 THEN                        -- rows affected by the last DML
+        RAISE_APPLICATION_ERROR(-20002, 'Target department not found');
+    END IF;
+
+    COMMIT;
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        ROLLBACK;
+        RAISE_APPLICATION_ERROR(-20003, 'Source department not found');
+    WHEN TOO_MANY_ROWS THEN
+        ROLLBACK; RAISE;
+    WHEN OTHERS THEN
+        ROLLBACK;
+        INSERT INTO error_log (proc_name, err_code, err_msg, logged_at)
+        VALUES ('transfer_budget', SQLCODE, SUBSTR(SQLERRM, 1, 4000), SYSTIMESTAMP);
+        COMMIT;                                      -- keep the log row (or use an autonomous transaction)
+        RAISE;                                       -- re-raise to the caller
+END transfer_budget;
+/</code></pre>
+<h3>3. Cursors: explicit, FOR loop and returning a result set</h3>
+<pre><code>CREATE OR REPLACE PROCEDURE print_high_earners (p_min IN NUMBER)
+IS
+    CURSOR c_emp IS SELECT emp_id, name, salary FROM employees WHERE salary &gt;= p_min ORDER BY salary DESC;
+BEGIN
+    FOR r IN c_emp LOOP                              -- implicit open / fetch / close
+        DBMS_OUTPUT.PUT_LINE(r.emp_id || ' ' || r.name || ' ' || r.salary);
+    END LOOP;
+END;
+/
+
+-- Return a result set to a client (like SELECT from a T-SQL procedure)
+CREATE OR REPLACE PROCEDURE get_employees (p_dept IN NUMBER, p_rc OUT SYS_REFCURSOR)
+IS
+BEGIN
+    OPEN p_rc FOR SELECT emp_id, name, salary FROM employees WHERE dept_id = p_dept;
+END;
+/
+
+-- Test in SQL*Plus / SQL Developer
+VARIABLE rc REFCURSOR
+EXEC get_employees(10, :rc)
+PRINT rc</code></pre>
+<h3>4. Bulk processing (BULK COLLECT / FORALL) – the fast way</h3>
+<pre><code>CREATE OR REPLACE PROCEDURE give_raise_bulk (p_dept IN NUMBER, p_pct IN NUMBER)
+IS
+    TYPE t_ids IS TABLE OF employees.emp_id%TYPE;
+    v_ids t_ids;
+BEGIN
+    SELECT emp_id BULK COLLECT INTO v_ids FROM employees WHERE dept_id = p_dept;   -- one fetch into memory
+
+    FORALL i IN 1 .. v_ids.COUNT                                                   -- one DML round trip for all rows
+        UPDATE employees SET salary = salary * (1 + p_pct / 100) WHERE emp_id = v_ids(i);
+
+    DBMS_OUTPUT.PUT_LINE(SQL%ROWCOUNT || ' rows updated');
+    COMMIT;
+END;
+/
+-- Row-by-row loops with DML inside cause "context switches" between PL/SQL and SQL engines – avoid.
+-- For huge sets use BULK COLLECT ... LIMIT 1000 in a loop, or a single set-based UPDATE.</code></pre>
+<h3>5. Upsert, dynamic SQL, function and trigger</h3>
+<pre><code>CREATE OR REPLACE PROCEDURE upsert_employee (
+    p_id IN NUMBER, p_name IN VARCHAR2, p_salary IN NUMBER, p_dept IN NUMBER
+)
+IS
+BEGIN
+    MERGE INTO employees t
+    USING (SELECT p_id AS emp_id, p_name AS name, p_salary AS salary, p_dept AS dept_id FROM dual) s
+       ON (t.emp_id = s.emp_id)
+    WHEN MATCHED THEN UPDATE SET t.name = s.name, t.salary = s.salary, t.dept_id = s.dept_id
+    WHEN NOT MATCHED THEN INSERT (emp_id, name, salary, dept_id) VALUES (s.emp_id, s.name, s.salary, s.dept_id);
+    COMMIT;
+END;
+/
+
+-- Dynamic SQL with bind variables (prevents injection and enables plan reuse)
+CREATE OR REPLACE PROCEDURE count_by_status (p_table IN VARCHAR2, p_status IN VARCHAR2, p_count OUT NUMBER)
+IS
+BEGIN
+    EXECUTE IMMEDIATE 'SELECT COUNT(*) FROM ' || DBMS_ASSERT.SQL_OBJECT_NAME(p_table) || ' WHERE status = :1'
+        INTO p_count USING p_status;
+END;
+/
+
+-- Function: usable inside SELECT
+CREATE OR REPLACE FUNCTION annual_salary (p_monthly IN NUMBER) RETURN NUMBER
+IS BEGIN RETURN p_monthly * 12; END;
+/
+SELECT name, annual_salary(salary) FROM employees;
+
+-- Row-level trigger
+CREATE OR REPLACE TRIGGER trg_emp_audit
+AFTER UPDATE OF salary ON employees
+FOR EACH ROW
+BEGIN
+    INSERT INTO salary_audit (emp_id, old_salary, new_salary, changed_at)
+    VALUES (:OLD.emp_id, :OLD.salary, :NEW.salary, SYSDATE);
+END;
+/</code></pre>
+<h3>6. Packages – group related procedures</h3>
+<pre><code>-- Specification (public interface)
+CREATE OR REPLACE PACKAGE emp_pkg AS
+    c_max_raise CONSTANT NUMBER := 20;
+    PROCEDURE give_raise (p_emp_id IN NUMBER, p_pct IN NUMBER);
+    FUNCTION  get_salary (p_emp_id IN NUMBER) RETURN NUMBER;
+END emp_pkg;
+/
+-- Body (implementation, may contain private helpers)
+CREATE OR REPLACE PACKAGE BODY emp_pkg AS
+    PROCEDURE give_raise (p_emp_id IN NUMBER, p_pct IN NUMBER) IS
+    BEGIN
+        IF p_pct &gt; c_max_raise THEN RAISE_APPLICATION_ERROR(-20010, 'Raise too large'); END IF;
+        UPDATE employees SET salary = salary * (1 + p_pct / 100) WHERE emp_id = p_emp_id;
+    END;
+
+    FUNCTION get_salary (p_emp_id IN NUMBER) RETURN NUMBER IS v NUMBER;
+    BEGIN SELECT salary INTO v FROM employees WHERE emp_id = p_emp_id; RETURN v; END;
+END emp_pkg;
+/
+EXEC emp_pkg.give_raise(2, 10);
+
+-- Inspect / compile problems
+SELECT * FROM user_source WHERE name = 'EMP_PKG' ORDER BY type, line;
+SELECT * FROM user_errors WHERE name = 'EMP_PKG';       -- or SHOW ERRORS in SQL*Plus
+DROP PROCEDURE get_dept_stats;
+GRANT EXECUTE ON emp_pkg TO reporting_user;</code></pre>
+<div class="callout tip"><b class="t">PL/SQL best practices</b>Prefer set-based SQL; use <code>BULK COLLECT</code>/<code>FORALL</code> when loops are unavoidable; use bind variables in dynamic SQL; never swallow errors with a bare <code>WHEN OTHERS THEN NULL</code>; use <code>%TYPE</code>/<code>%ROWTYPE</code> so code adapts to schema changes; group related code in packages; remember DDL commits implicitly in Oracle and <code>SELECT INTO</code> must return exactly one row.</div>
+</section>
+
+<section id="proc-compare">
+<h2><span class="n">5.5</span>SQL Server vs Oracle Procedures &amp; Interview Q&amp;A</h2>
+<table>
+<tr><th>Feature</th><th>SQL Server (T-SQL)</th><th>Oracle (PL/SQL)</th></tr>
+<tr><td>Create</td><td><code>CREATE OR ALTER PROCEDURE</code></td><td><code>CREATE OR REPLACE PROCEDURE</code></td></tr>
+<tr><td>Body delimiters</td><td><code>AS BEGIN … END</code></td><td><code>IS/AS [declarations] BEGIN … END;</code></td></tr>
+<tr><td>Variables</td><td><code>DECLARE @x INT = 1; SET @x = 2;</code></td><td><code>x NUMBER := 1;</code> in declare section</td></tr>
+<tr><td>Parameters</td><td><code>@name TYPE [OUTPUT]</code></td><td><code>name [IN|OUT|IN OUT] TYPE</code></td></tr>
+<tr><td>Returning data</td><td>Plain <code>SELECT</code> returns a result set; <code>RETURN</code> = integer code</td><td>Must use <code>OUT</code> params or <code>SYS_REFCURSOR</code>; plain SELECT needs <code>INTO</code></td></tr>
+<tr><td>Error handling</td><td><code>TRY … CATCH</code>, <code>THROW</code>, <code>RAISERROR</code></td><td><code>EXCEPTION WHEN … THEN</code>, <code>RAISE_APPLICATION_ERROR</code></td></tr>
+<tr><td>Transactions</td><td>Explicit <code>BEGIN TRAN / COMMIT</code>; autocommit by default per statement</td><td>Implicit transaction starts with first DML; explicit <code>COMMIT/ROLLBACK</code>; DDL auto-commits</td></tr>
+<tr><td>Execute</td><td><code>EXEC proc @p = 1</code></td><td><code>EXEC proc(1)</code> or <code>BEGIN proc(1); END;</code></td></tr>
+<tr><td>Dynamic SQL</td><td><code>sp_executesql</code></td><td><code>EXECUTE IMMEDIATE … USING</code></td></tr>
+<tr><td>Temp storage</td><td><code>#temp</code> tables, table variables</td><td>Global temporary tables, collections</td></tr>
+<tr><td>Row count</td><td><code>@@ROWCOUNT</code></td><td><code>SQL%ROWCOUNT</code></td></tr>
+<tr><td>Grouping routines</td><td>Schemas only</td><td>Packages (spec + body, state, overloading)</td></tr>
+<tr><td>Debug output</td><td><code>PRINT</code></td><td><code>DBMS_OUTPUT.PUT_LINE</code></td></tr>
+<tr><td>Dummy table</td><td>Not needed (<code>SELECT 1</code>)</td><td><code>FROM dual</code></td></tr>
+</table>
+
+<details><summary>What is a stored procedure and why use one?</summary><div class="ans">A named, precompiled set of SQL/procedural statements stored in the database and run with parameters. Benefits: performance (plan reuse, fewer round trips), security (grant EXECUTE only), reuse and centralized logic, and atomic multi-step transactions.</div></details>
+<details><summary>Procedure vs function – what are the differences?</summary><div class="ans">A function must return a value and can be used inside a SELECT/WHERE; a procedure is called as a statement, can return zero or many values (OUT params/result sets), and can freely run DML and manage transactions. SQL Server functions can't perform side-effecting DML; Oracle functions with DML can't be called from SQL queries.</div></details>
+<details><summary>How do you return data from a procedure in SQL Server vs Oracle?</summary><div class="ans">SQL Server: end the procedure with a <code>SELECT</code> (result set), use <code>OUTPUT</code> parameters for scalars, and <code>RETURN</code> only for an integer status. Oracle: use <code>OUT</code> parameters or a <code>SYS_REFCURSOR</code> for result sets.</div></details>
+<details><summary>How do you handle errors in a procedure?</summary><div class="ans">SQL Server: <code>BEGIN TRY … END TRY BEGIN CATCH … END CATCH</code> with <code>XACT_ABORT ON</code>, roll back if <code>@@TRANCOUNT &gt; 0</code>, log via <code>ERROR_MESSAGE()</code> and re-raise with <code>THROW</code>. Oracle: an <code>EXCEPTION</code> block with specific handlers (<code>NO_DATA_FOUND</code>, <code>TOO_MANY_ROWS</code>, <code>WHEN OTHERS</code>), user errors via <code>RAISE_APPLICATION_ERROR</code>, and <code>RAISE</code> to propagate.</div></details>
+<details><summary>What is SET NOCOUNT ON and why use it?</summary><div class="ans">It stops SQL Server from sending "n rows affected" messages for each statement, cutting network chatter and avoiding confusion in client libraries (e.g. ADO.NET) that read the first result.</div></details>
+<details><summary>What is parameter sniffing?</summary><div class="ans">SQL Server compiles a plan using the first parameter values it sees and reuses it. If later values have very different data distributions the cached plan may be poor. Fixes: <code>OPTION (RECOMPILE)</code>, <code>OPTIMIZE FOR</code>, local variables, or splitting the procedure by case.</div></details>
+<details><summary>How do you prevent SQL injection in procedures?</summary><div class="ans">Use parameters, not string concatenation. For dynamic SQL use <code>sp_executesql</code> with parameters (SQL Server) or <code>EXECUTE IMMEDIATE … USING</code> bind variables (Oracle); whitelist identifiers and quote them with <code>QUOTENAME</code> / <code>DBMS_ASSERT</code>.</div></details>
+<details><summary>What is a package in Oracle and why use it?</summary><div class="ans">A package bundles related procedures, functions, types and variables into a specification (public API) and a body (implementation). It enables encapsulation, overloading, session-level state, and loads into memory once, improving performance and organization.</div></details>
+<details><summary>Why are cursors/loops slow, and what's the alternative?</summary><div class="ans">Row-by-row processing (RBAR – "row by agonizing row") pays per-row overhead and, in Oracle, repeated PL/SQL↔SQL context switches. Prefer a single set-based statement; in Oracle use <code>BULK COLLECT</code> + <code>FORALL</code>; in SQL Server prefer set-based updates, table-valued parameters and <code>MERGE</code>.</div></details>
+<details><summary>Explain IN, OUT and IN OUT parameters (Oracle) and OUTPUT parameters (SQL Server).</summary><div class="ans">Oracle: IN passes a value in (read-only), OUT returns a value, IN OUT does both. SQL Server parameters are input by default; add <code>OUTPUT</code> to return a value to the caller (it is effectively IN OUT).</div></details>
+<details><summary>How do you view, change or troubleshoot a stored procedure?</summary><div class="ans">SQL Server: <code>sp_helptext</code>, <code>OBJECT_DEFINITION()</code>, <code>sys.sql_modules</code>; modify with <code>ALTER PROCEDURE</code>. Oracle: <code>USER_SOURCE</code> for source, <code>USER_ERRORS</code>/<code>SHOW ERRORS</code> for compile errors; modify with <code>CREATE OR REPLACE</code>. Check plans with the execution plan / <code>DBMS_XPLAN</code>.</div></details>
+<details><summary>Can a stored procedure call another procedure? Can it be recursive?</summary><div class="ans">Yes to both. SQL Server nesting is limited to 32 levels; Oracle supports recursion until stack/memory limits. Ensure transaction handling is consistent across nested calls (SQL Server <code>@@TRANCOUNT</code>, Oracle savepoints).</div></details>
+</section>
+
+<!-- ============ 6 INTERVIEW ============ -->
+<section id="queries">
+<h2><span class="n">6</span>Classic Interview Query Problems</h2>
+<p>Click a problem to reveal the solution. Try writing it yourself first. Uses the sample schema above.</p>
+<div class="toolbar"><button class="toggle" type="button" onclick="document.querySelectorAll('#queries details').forEach(d=>d.open=true)">Expand all</button><button class="toggle" type="button" onclick="document.querySelectorAll('#queries details').forEach(d=>d.open=false)">Collapse all</button></div>
+
+<details><summary>1. Find the second highest salary <span class="lvl">easy</span></summary><div class="ans">
+<pre><code>-- A) Subquery
+SELECT MAX(salary) AS second_highest
+FROM   employees
+WHERE  salary &lt; (SELECT MAX(salary) FROM employees);
+
+-- B) DENSE_RANK (generalizes to Nth, handles ties)
+SELECT DISTINCT salary FROM (
+    SELECT salary, DENSE_RANK() OVER (ORDER BY salary DESC) AS rnk FROM employees
+) t WHERE rnk = 2;
+
+-- C) OFFSET (returns NULL-less empty set if none)
+SELECT DISTINCT salary FROM employees ORDER BY salary DESC LIMIT 1 OFFSET 1;</code></pre>
+<p>Use <code>DENSE_RANK</code>, not <code>ROW_NUMBER</code>, so tied salaries count as one rank.</p></div></details>
+
+<details><summary>2. Nth highest salary per department / top 3 per group <span class="lvl">medium</span></summary><div class="ans">
+<pre><code>SELECT dept_id, name, salary
+FROM (
+    SELECT e.*, DENSE_RANK() OVER (PARTITION BY dept_id ORDER BY salary DESC) AS rnk
+    FROM employees e
+) t
+WHERE rnk &lt;= 3;          -- change to = N for the Nth highest</code></pre></div></details>
+
+<details><summary>3. Find duplicate rows (e.g. duplicate emails) <span class="lvl">easy</span></summary><div class="ans">
+<pre><code>SELECT email, COUNT(*) AS cnt
+FROM   employees
+GROUP BY email
+HAVING COUNT(*) &gt; 1;</code></pre></div></details>
+
+<details><summary>4. Delete duplicates but keep one row <span class="lvl">medium</span></summary><div class="ans">
+<pre><code>-- Works in PostgreSQL / SQL Server (CTE deletes through to the table in SQL Server)
+WITH d AS (
+    SELECT ctid, ROW_NUMBER() OVER (PARTITION BY email ORDER BY emp_id) AS rn FROM employees  -- ctid: PG row id
+)
+DELETE FROM employees WHERE ctid IN (SELECT ctid FROM d WHERE rn &gt; 1);
+
+-- Portable alternative: keep the smallest id
+DELETE FROM employees
+WHERE emp_id NOT IN (SELECT MIN(emp_id) FROM employees GROUP BY email);   -- MySQL: wrap in a derived table</code></pre></div></details>
+
+<details><summary>5. Employees who earn more than their manager <span class="lvl">easy</span></summary><div class="ans">
+<pre><code>SELECT e.name, e.salary, m.name AS manager, m.salary AS mgr_salary
+FROM   employees e
+JOIN   employees m ON m.emp_id = e.manager_id
+WHERE  e.salary &gt; m.salary;</code></pre></div></details>
+
+<details><summary>6. Departments with no employees / customers with no orders <span class="lvl">easy</span></summary><div class="ans">
+<pre><code>SELECT d.dept_name FROM departments d
+WHERE NOT EXISTS (SELECT 1 FROM employees e WHERE e.dept_id = d.dept_id);
+
+SELECT c.* FROM customers c LEFT JOIN orders o ON o.customer_id = c.customer_id WHERE o.order_id IS NULL;</code></pre></div></details>
+
+<details><summary>7. Employees earning above their department average <span class="lvl">medium</span></summary><div class="ans">
+<pre><code>SELECT name, dept_id, salary FROM (
+    SELECT e.*, AVG(salary) OVER (PARTITION BY dept_id) AS dept_avg FROM employees e
+) t WHERE salary &gt; dept_avg;</code></pre></div></details>
+
+<details><summary>8. Order count per customer, including customers with zero orders <span class="lvl">easy</span></summary><div class="ans">
+<pre><code>SELECT c.customer_id, c.name, COUNT(o.order_id) AS orders     -- count the RIGHT table's column, not *
+FROM   customers c
+LEFT JOIN orders o ON o.customer_id = c.customer_id
+GROUP BY c.customer_id, c.name;</code></pre></div></details>
+
+<details><summary>9. Running total and % of grand total <span class="lvl">medium</span></summary><div class="ans">
+<pre><code>SELECT order_date, amount,
+       SUM(amount) OVER (ORDER BY order_date, order_id) AS running_total,
+       ROUND(100.0 * amount / SUM(amount) OVER (), 2)    AS pct_of_total
+FROM orders;</code></pre></div></details>
+
+<details><summary>10. Month-over-month revenue growth <span class="lvl">medium</span></summary><div class="ans">
+<pre><code>WITH monthly AS (
+    SELECT DATE_TRUNC('month', order_date) AS month, SUM(amount) AS revenue
+    FROM   orders WHERE status = 'DONE' GROUP BY 1
+)
+SELECT month, revenue,
+       LAG(revenue) OVER (ORDER BY month) AS prev_revenue,
+       ROUND(100.0 * (revenue - LAG(revenue) OVER (ORDER BY month))
+             / NULLIF(LAG(revenue) OVER (ORDER BY month), 0), 2) AS mom_pct
+FROM monthly;</code></pre></div></details>
+
+<details><summary>11. Consecutive days / gaps and islands (login streaks) <span class="lvl">hard</span></summary><div class="ans">
+<p>Trick: subtracting <code>ROW_NUMBER()</code> from the date gives a constant for each consecutive run.</p>
+<pre><code>WITH d AS (
+    SELECT DISTINCT user_id, login_date FROM logins
+), g AS (
+    SELECT user_id, login_date,
+           login_date - (ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY login_date)) * INTERVAL '1 day' AS grp
+    FROM d
+)
+SELECT user_id, MIN(login_date) AS streak_start, MAX(login_date) AS streak_end, COUNT(*) AS days
+FROM   g
+GROUP BY user_id, grp
+HAVING COUNT(*) &gt;= 3;          -- users with 3+ consecutive days</code></pre>
+<p>For numeric ids use <code>id - ROW_NUMBER() OVER (ORDER BY id)</code>.</p></div></details>
+
+<details><summary>12. Find missing numbers in a sequence <span class="lvl">medium</span></summary><div class="ans">
+<pre><code>SELECT id + 1 AS gap_start, next_id - 1 AS gap_end FROM (
+    SELECT id, LEAD(id) OVER (ORDER BY id) AS next_id FROM t
+) x WHERE next_id - id &gt; 1;</code></pre></div></details>
+
+<details><summary>13. Pivot rows to columns (sales per status per customer) <span class="lvl">medium</span></summary><div class="ans">
+<pre><code>SELECT customer_id,
+       SUM(CASE WHEN status = 'DONE'      THEN amount END) AS done,
+       SUM(CASE WHEN status = 'CANCELLED' THEN amount END) AS cancelled
+FROM orders GROUP BY customer_id;
+-- Unpivot: use UNION ALL of per-column SELECTs, or UNPIVOT / LATERAL VALUES / stack() in Spark</code></pre></div></details>
+
+<details><summary>14. Median salary <span class="lvl">hard</span></summary><div class="ans">
+<pre><code>-- PostgreSQL / Oracle / Snowflake
+SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY salary) AS median FROM employees;
+
+-- Portable
+SELECT AVG(salary) AS median FROM (
+    SELECT salary,
+           ROW_NUMBER() OVER (ORDER BY salary) AS rn,
+           COUNT(*)     OVER ()                AS cnt
+    FROM employees
+) t
+WHERE rn IN (FLOOR((cnt + 1) / 2.0), CEIL((cnt + 1) / 2.0));</code></pre></div></details>
+
+<details><summary>15. Customers who ordered in BOTH Feb and Mar <span class="lvl">medium</span></summary><div class="ans">
+<pre><code>SELECT customer_id
+FROM   orders
+WHERE  order_date &gt;= '2025-02-01' AND order_date &lt; '2025-04-01'
+GROUP BY customer_id
+HAVING COUNT(DISTINCT DATE_TRUNC('month', order_date)) = 2;</code></pre></div></details>
+
+<details><summary>16. First and last order per customer <span class="lvl">medium</span></summary><div class="ans">
+<pre><code>SELECT DISTINCT customer_id,
+       FIRST_VALUE(order_id) OVER w AS first_order,
+       LAST_VALUE(order_id)  OVER w AS last_order
+FROM orders
+WINDOW w AS (PARTITION BY customer_id ORDER BY order_date
+             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING);   -- frame needed for LAST_VALUE!</code></pre></div></details>
+
+<details><summary>17. Second order of each customer <span class="lvl">medium</span></summary><div class="ans">
+<pre><code>SELECT * FROM (
+    SELECT o.*, ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY order_date) AS rn FROM orders o
+) t WHERE rn = 2;</code></pre></div></details>
+
+<details><summary>18. Day-1 retention (users who came back the next day) <span class="lvl">hard</span></summary><div class="ans">
+<pre><code>WITH first_day AS (
+    SELECT user_id, MIN(login_date) AS d0 FROM logins GROUP BY user_id
+)
+SELECT f.d0 AS cohort_date,
+       COUNT(*)                                   AS cohort_size,
+       COUNT(l.user_id)                           AS returned_d1,
+       ROUND(100.0 * COUNT(l.user_id) / COUNT(*), 2) AS d1_retention_pct
+FROM   first_day f
+LEFT JOIN logins l ON l.user_id = f.user_id AND l.login_date = f.d0 + 1
+GROUP BY f.d0 ORDER BY f.d0;</code></pre></div></details>
+
+<details><summary>19. Swap values (e.g. M ↔ F) with one UPDATE <span class="lvl">easy</span></summary><div class="ans">
+<pre><code>UPDATE person SET sex = CASE sex WHEN 'M' THEN 'F' WHEN 'F' THEN 'M' END;</code></pre></div></details>
+
+<details><summary>20. Departments with more than N employees and their average salary <span class="lvl">easy</span></summary><div class="ans">
+<pre><code>SELECT d.dept_name, COUNT(*) AS headcount, ROUND(AVG(e.salary), 2) AS avg_salary
+FROM   employees e JOIN departments d ON d.dept_id = e.dept_id
+GROUP BY d.dept_name
+HAVING COUNT(*) &gt; 1;</code></pre></div></details>
+
+<details><summary>21. Top customer by revenue per month <span class="lvl">hard</span></summary><div class="ans">
+<pre><code>WITH m AS (
+    SELECT DATE_TRUNC('month', order_date) AS month, customer_id, SUM(amount) AS revenue
+    FROM orders WHERE status = 'DONE' GROUP BY 1, 2
+), r AS (
+    SELECT *, RANK() OVER (PARTITION BY month ORDER BY revenue DESC) AS rnk FROM m
+)
+SELECT month, customer_id, revenue FROM r WHERE rnk = 1;</code></pre></div></details>
+
+<details><summary>22. Sessionize events (new session after 30 min of inactivity) <span class="lvl">hard</span></summary><div class="ans">
+<pre><code>WITH flagged AS (
+    SELECT user_id, event_ts,
+           CASE WHEN event_ts - LAG(event_ts) OVER (PARTITION BY user_id ORDER BY event_ts) &gt; INTERVAL '30 minutes'
+                  OR LAG(event_ts) OVER (PARTITION BY user_id ORDER BY event_ts) IS NULL
+                THEN 1 ELSE 0 END AS new_session
+    FROM events
+)
+SELECT user_id, event_ts,
+       SUM(new_session) OVER (PARTITION BY user_id ORDER BY event_ts) AS session_id
+FROM flagged;</code></pre></div></details>
+
+<details><summary>23. Cumulative distinct users / new vs returning customers per month <span class="lvl">hard</span></summary><div class="ans">
+<pre><code>WITH first_order AS (
+    SELECT customer_id, DATE_TRUNC('month', MIN(order_date)) AS first_month FROM orders GROUP BY customer_id
+), m AS (
+    SELECT DISTINCT customer_id, DATE_TRUNC('month', order_date) AS month FROM orders
+)
+SELECT m.month,
+       COUNT(*) FILTER (WHERE m.month = f.first_month) AS new_customers,
+       COUNT(*) FILTER (WHERE m.month &gt; f.first_month) AS returning_customers
+FROM m JOIN first_order f USING (customer_id)
+GROUP BY m.month ORDER BY m.month;</code></pre></div></details>
+
+<details><summary>24. Concatenate values per group (names per department) <span class="lvl">easy</span></summary><div class="ans">
+<pre><code>SELECT dept_id, STRING_AGG(name, ', ' ORDER BY name) AS members FROM employees GROUP BY dept_id;
+-- MySQL: GROUP_CONCAT(name ORDER BY name SEPARATOR ', ')  | Spark: concat_ws(', ', collect_list(name))</code></pre></div></details>
+</section>
+
+<section id="qa">
+<h2><span class="n">6.1</span>Concept Interview Questions &amp; Answers</h2>
+<div class="toolbar"><button class="toggle" type="button" onclick="document.querySelectorAll('#qa details').forEach(d=>d.open=true)">Expand all</button><button class="toggle" type="button" onclick="document.querySelectorAll('#qa details').forEach(d=>d.open=false)">Collapse all</button></div>
+
+<details><summary>What is the difference between WHERE and HAVING?</summary><div class="ans"><code>WHERE</code> filters individual rows <i>before</i> grouping and can't use aggregates. <code>HAVING</code> filters groups <i>after</i> <code>GROUP BY</code> and can use aggregates. Put non-aggregate filters in <code>WHERE</code> – it's faster because fewer rows get grouped.</div></details>
+
+<details><summary>DELETE vs TRUNCATE vs DROP?</summary><div class="ans"><b>DELETE</b> removes selected rows (DML, logged per row, fires triggers, supports WHERE). <b>TRUNCATE</b> removes all rows quickly, resets identity, no WHERE. <b>DROP</b> removes the whole table definition and data.</div></details>
+
+<details><summary>UNION vs UNION ALL?</summary><div class="ans"><code>UNION</code> removes duplicates (extra sort/hash step). <code>UNION ALL</code> keeps everything and is faster – default to it unless you need dedup.</div></details>
+
+<details><summary>Explain the different types of joins.</summary><div class="ans">INNER = matches only; LEFT/RIGHT = all rows from one side + matches; FULL = all rows from both; CROSS = every combination; SELF = table joined to itself. Semi/anti joins test existence/non-existence without returning right-side columns.</div></details>
+
+<details><summary>Primary key vs unique key vs foreign key?</summary><div class="ans">PK: uniquely identifies rows, NOT NULL, one per table. Unique: prevents duplicates, allows NULL(s), many per table. FK: references a key in another table to enforce referential integrity.</div></details>
+
+<details><summary>RANK vs DENSE_RANK vs ROW_NUMBER?</summary><div class="ans">For values 100,100,90: ROW_NUMBER → 1,2,3 (always unique); RANK → 1,1,3 (gap after ties); DENSE_RANK → 1,1,2 (no gap).</div></details>
+
+<details><summary>COUNT(*) vs COUNT(column) vs COUNT(DISTINCT column)?</summary><div class="ans"><code>COUNT(*)</code> counts all rows; <code>COUNT(col)</code> counts non-NULL values; <code>COUNT(DISTINCT col)</code> counts unique non-NULL values.</div></details>
+
+<details><summary>IN vs EXISTS? Why does NOT IN sometimes return nothing?</summary><div class="ans"><code>EXISTS</code> stops at the first match and works well with correlated subqueries on large sets; <code>IN</code> compares against a list. <code>NOT IN</code> returns no rows if the list contains a NULL (comparison becomes UNKNOWN), so prefer <code>NOT EXISTS</code>.</div></details>
+
+<details><summary>What is a CTE, and how is it different from a subquery, view or temp table?</summary><div class="ans">A CTE (<code>WITH</code>) is a named result set valid for one statement – it improves readability and supports recursion. A subquery is inline and unnamed. A view is a stored query saved in the database. A temp table physically stores intermediate data for a session and can be indexed.</div></details>
+
+<details><summary>View vs materialized view?</summary><div class="ans">A view stores only the query and runs it each time. A materialized view stores the result physically and must be refreshed – faster reads, stale data until refresh.</div></details>
+
+<details><summary>What is normalization? Why denormalize?</summary><div class="ans">Organizing tables to reduce redundancy and anomalies (1NF → 3NF/BCNF). Denormalization deliberately duplicates data (star schemas, reporting tables) to cut joins and speed analytical reads at the cost of storage and update complexity.</div></details>
+
+<details><summary>Explain ACID.</summary><div class="ans">Atomicity (all-or-nothing), Consistency (constraints preserved), Isolation (concurrent transactions don't interfere), Durability (committed data survives failure).</div></details>
+
+<details><summary>What are transaction isolation levels and the problems they prevent?</summary><div class="ans">READ UNCOMMITTED allows dirty reads; READ COMMITTED prevents them; REPEATABLE READ also prevents non-repeatable reads; SERIALIZABLE also prevents phantoms. Higher isolation = more locking/less concurrency.</div></details>
+
+<details><summary>Clustered vs non-clustered index?</summary><div class="ans">A clustered index defines the physical order of the table's rows (one per table). A non-clustered index is a separate structure with pointers to rows (many allowed). Lookups through a non-clustered index may need an extra key lookup unless the index is covering.</div></details>
+
+<details><summary>What makes a query "SARGable"? Why does it matter?</summary><div class="ans">Search-ARGument-able: predicates the optimizer can satisfy with an index seek. Wrapping the indexed column in a function (<code>YEAR(col)</code>), arithmetic, or leading wildcards forces scans. Rewrite as range comparisons on the raw column.</div></details>
+
+<details><summary>How would you optimize a slow query?</summary><div class="ans">Read the execution plan; add/adjust indexes on filter/join columns; avoid <code>SELECT *</code>; make predicates SARGable; reduce rows early; replace correlated subqueries; check join order and statistics; consider partitioning, pre-aggregation or materialized views; verify no implicit type conversions.</div></details>
+
+<details><summary>What is a correlated subquery?</summary><div class="ans">A subquery that references columns of the outer query and conceptually runs once per outer row. Often rewritable as a join or window function for better performance.</div></details>
+
+<details><summary>What is the logical order of query execution?</summary><div class="ans">FROM/JOIN → WHERE → GROUP BY → HAVING → SELECT (incl. window functions) → DISTINCT → ORDER BY → LIMIT. This is why aliases can't be used in <code>WHERE</code> but can in <code>ORDER BY</code>.</div></details>
+
+<details><summary>Stored procedure vs function vs trigger?</summary><div class="ans">A stored procedure is a reusable routine that can perform DML/transactions and return results/output params. A function returns a value (scalar or table) and is usable inside queries. A trigger runs automatically on INSERT/UPDATE/DELETE events.</div></details>
+
+<details><summary>What is a deadlock and how do you avoid it?</summary><div class="ans">Two transactions each hold a lock the other needs, so neither can proceed; the DB kills one as a victim. Avoid by accessing tables in a consistent order, keeping transactions short, using appropriate indexes and isolation levels, and retrying on deadlock errors.</div></details>
+
+<details><summary>DISTINCT vs GROUP BY?</summary><div class="ans">Both can dedupe. <code>GROUP BY</code> is needed when you aggregate; <code>DISTINCT</code> is simpler for pure deduplication. Optimizers often generate identical plans for plain dedup.</div></details>
+
+<details><summary>What is a surrogate key vs natural key?</summary><div class="ans">A natural key is a real-world attribute (email, SSN). A surrogate key is a system-generated meaningless id (identity/sequence/UUID) that never changes – preferred in warehouses for dimensions and for SCD2.</div></details>
+
+<details><summary>What is a star schema? Fact vs dimension tables?</summary><div class="ans">A star schema puts a central fact table (numeric measures + FKs, many rows) around denormalized dimension tables (descriptive attributes like customer, product, date). It's optimized for analytic queries.</div></details>
+
+<details><summary>Explain SCD Type 1, 2 and 3.</summary><div class="ans">Type 1 overwrites (no history). Type 2 inserts a new row per change with effective dates/current flag (full history). Type 3 stores the previous value in an extra column (limited history).</div></details>
+
+<details><summary>CHAR vs VARCHAR?</summary><div class="ans">CHAR is fixed-length (padded), good for fixed codes. VARCHAR is variable-length, stores only used characters plus a small length overhead.</div></details>
+
+<details><summary>What is a self join and when do you use it?</summary><div class="ans">Joining a table to itself with aliases – for hierarchies (employee → manager), comparing rows (pairs, consecutive records) or finding duplicates.</div></details>
+
+<details><summary>What does the HAVING clause do without GROUP BY?</summary><div class="ans">The whole result is treated as one group, e.g. <code>SELECT COUNT(*) FROM t HAVING COUNT(*) &gt; 10</code> returns a row only if the condition holds.</div></details>
+
+<details><summary>How do you implement pagination efficiently?</summary><div class="ans"><code>LIMIT n OFFSET m</code> is simple but slow for large offsets (it scans and discards rows). Use keyset pagination: <code>WHERE id &gt; :last_seen_id ORDER BY id LIMIT n</code> with an index on <code>id</code>.</div></details>
+
+<details><summary>What are ON DELETE CASCADE / SET NULL / RESTRICT?</summary><div class="ans">Referential actions on parent-row deletion: CASCADE deletes dependent child rows, SET NULL nulls the FK, RESTRICT/NO ACTION blocks the delete.</div></details>
+
+<details><summary>OLTP vs OLAP?</summary><div class="ans">OLTP: many short transactions, normalized schema, row stores (orders, payments). OLAP: complex read-heavy analytics over large history, denormalized/star schema, often columnar stores (warehouses, lakehouses).</div></details>
+
+<details><summary>How do you handle duplicates during a data load (idempotency)?</summary><div class="ans">Load into a staging table, dedupe with <code>ROW_NUMBER()</code> on the business key, then <code>MERGE</code>/<code>INSERT … ON CONFLICT</code> into the target so re-running the job doesn't create duplicates.</div></details>
+</section>
+
+<section id="cheat">
+<h2><span class="n">A</span>Cheat Sheet &amp; Tips</h2>
+<table>
+<tr><th>Need</th><th>Use</th></tr>
+<tr><td>Top-N per group</td><td><code>ROW_NUMBER/DENSE_RANK() OVER (PARTITION BY … ORDER BY …)</code> in a CTE, filter rank</td></tr>
+<tr><td>Previous/next row</td><td><code>LAG</code> / <code>LEAD</code></td></tr>
+<tr><td>Running total</td><td><code>SUM() OVER (ORDER BY … ROWS UNBOUNDED PRECEDING)</code></td></tr>
+<tr><td>Rows with no match</td><td><code>LEFT JOIN … WHERE right.key IS NULL</code> or <code>NOT EXISTS</code></td></tr>
+<tr><td>Duplicates</td><td><code>GROUP BY … HAVING COUNT(*) &gt; 1</code></td></tr>
+<tr><td>Consecutive sequences</td><td>value − <code>ROW_NUMBER()</code> trick</td></tr>
+<tr><td>Rows → columns</td><td><code>SUM(CASE WHEN …)</code> / PIVOT</td></tr>
+<tr><td>Upsert</td><td><code>MERGE</code> / <code>ON CONFLICT</code> / <code>ON DUPLICATE KEY</code></td></tr>
+</table>
+<h3>Interview approach</h3>
+<ul>
+<li>Clarify the schema, grain, and how ties/NULLs/duplicates should be treated before writing SQL.</li>
+<li>Build queries step by step with CTEs; sanity-check row counts after each join.</li>
+<li>State the dialect you assume and mention alternatives (e.g. <code>TOP</code> vs <code>LIMIT</code>).</li>
+<li>Discuss performance: indexes, join order, SARGability, avoiding correlated subqueries.</li>
+<li>Test edge cases: empty table, all-NULL column, ties, single row, duplicates.</li>
+</ul>
+</section>
+
+</main>
+</div>
+<footer>SQL Study Guide · Examples use ANSI/PostgreSQL syntax unless noted · Always verify dialect-specific functions for your database.</footer>
+
+<script>
+(function(){
+  var root=document.documentElement,btn=document.getElementById('themeBtn');
+  try{var s=localStorage.getItem('theme');if(s)root.setAttribute('data-theme',s);
+      else if(window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)root.setAttribute('data-theme','light');}catch(e){}
+  btn.addEventListener('click',function(){
+    var n=root.getAttribute('data-theme')==='dark'?'light':'dark';
+    root.setAttribute('data-theme',n);try{localStorage.setItem('theme',n)}catch(e){}
+  });
+})();
+
+/* SQL syntax highlighter */
+(function(){
+  function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+  var KW='SELECT|DISTINCT|FROM|WHERE|GROUP|BY|ORDER|HAVING|JOIN|INNER|LEFT|RIGHT|FULL|OUTER|CROSS|ON|USING|AS|WITH|RECURSIVE|OVER|PARTITION|WINDOW|ROWS|RANGE|BETWEEN|UNBOUNDED|PRECEDING|FOLLOWING|CURRENT|ROW|AND|OR|NOT|IN|IS|NULL|LIKE|EXISTS|CASE|WHEN|THEN|ELSE|END|UNION|ALL|INTERSECT|EXCEPT|MINUS|LIMIT|OFFSET|TOP|FETCH|FIRST|NEXT|ONLY|INSERT|INTO|VALUES|UPDATE|SET|DELETE|MERGE|MATCHED|CREATE|ALTER|DROP|TRUNCATE|TABLE|VIEW|INDEX|UNIQUE|PRIMARY|KEY|FOREIGN|REFERENCES|CHECK|DEFAULT|CONSTRAINT|ADD|COLUMN|TYPE|CASCADE|BEGIN|COMMIT|ROLLBACK|SAVEPOINT|TO|ASC|DESC|FILTER|WITHIN|INTERVAL|EXPLAIN|ANALYZE|CONFLICT|DO|NOTHING|DUPLICATE|ROLLUP|CUBE|GROUPING|SETS|TRUE|FALSE|ON|FOR|INT|VARCHAR|DECIMAL|DATE|TIMESTAMP|PROCEDURE|FUNCTION|TRIGGER|PACKAGE|BODY|DECLARE|EXEC|EXECUTE|IMMEDIATE|OUTPUT|OUT|RETURN|RETURNS|RETURNING|IF|WHILE|LOOP|TRY|CATCH|THROW|RAISERROR|GO|NOCOUNT|REPLACE|EXCEPTION|CURSOR|OPEN|CLOSE|FETCH|BULK|COLLECT|FORALL|IS|NUMBER|VARCHAR2|PLS_INTEGER|BOOLEAN|AFTER|BEFORE|EACH|INSTEAD|OF|GRANT|REVOKE|READONLY|TRAN|TRANSACTION';
+  var re=new RegExp("(--.*)|('(?:[^']|'')*')|\\b("+KW+")\\b|\\b(\\d+(?:\\.\\d+)?)\\b|\\b([A-Za-z_]\\w*)(?=\\()",'gi');
+  function hl(code){
+    var out='',last=0,m;re.lastIndex=0;
+    while((m=re.exec(code))){
+      out+=esc(code.slice(last,m.index));
+      var cls=m[1]?'c':m[2]?'s':m[3]?'k':m[4]?'m':'f';
+      out+='<span class="'+cls+'">'+esc(m[0])+'</span>';last=m.index+m[0].length;
+    }
+    return out+esc(code.slice(last));
+  }
+  document.querySelectorAll('pre').forEach(function(pre){
+    var c=pre.querySelector('code');if(!c)return;
+    var raw=c.textContent;c.innerHTML=hl(raw);
+    var b=document.createElement('button');b.className='copy';b.type='button';b.textContent='Copy';
+    b.addEventListener('click',function(){
+      var done=function(){b.textContent='Copied!';setTimeout(function(){b.textContent='Copy'},1200)};
+      if(navigator.clipboard)navigator.clipboard.writeText(raw).then(done,done);
+    });
+    pre.appendChild(b);
+  });
+})();
+
+(function(){
+  var links=[].slice.call(document.querySelectorAll('#toc a'));
+  var map={};links.forEach(function(a){map[a.getAttribute('href').slice(1)]=a});
+  if(!('IntersectionObserver' in window))return;
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting){links.forEach(function(a){a.classList.remove('active')});
+        var a=map[e.target.id];if(a)a.classList.add('active');}
+    });
+  },{rootMargin:'-20% 0px -70% 0px'});
+  document.querySelectorAll('main section').forEach(function(s){io.observe(s)});
+})();
+</script>
+</body>
+</html>
