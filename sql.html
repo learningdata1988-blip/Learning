@@ -55,17 +55,34 @@ details[open] summary{border-bottom:1px solid var(--border);color:var(--accent)}
 details .ans{padding:6px 16px 12px}
 .lvl{font-size:.7rem;border:1px solid var(--border);border-radius:10px;padding:1px 8px;margin-left:8px;color:var(--muted);font-weight:400}
 .toolbar{margin:8px 0 16px;display:flex;gap:8px;flex-wrap:wrap}
+.layout.nav-hidden{grid-template-columns:1fr}
+.layout.nav-hidden nav{display:none}
+.layout.nav-hidden main{max-width:1100px;margin:0 auto;width:100%}
+.hdr-left{display:flex;align-items:center;gap:12px;min-width:0}
+.lvl.l2{color:var(--ok);border-color:var(--ok)}.lvl.l3{color:var(--warn);border-color:var(--warn)}.lvl.l4{color:#f87171;border-color:#f87171}
 footer{text-align:center;color:var(--muted);padding:24px;font-size:.85rem;border-top:1px solid var(--border)}
 @media(max-width:900px){.layout{grid-template-columns:1fr;padding:16px}nav{position:static;max-height:none;border-bottom:1px solid var(--border);padding-bottom:12px}}
 </style>
 </head>
 <body>
 <header>
-  <h1><span>🗄️</span> SQL Study Guide &amp; Interview Prep</h1>
+  <div class="hdr-left">
+    <button class="toggle" id="navBtn" type="button" title="Show or hide the left contents panel">✕ Hide contents</button>
+    <h1><span>🗄️</span> SQL Study Guide &amp; Interview Prep</h1>
+  </div>
   <button class="toggle" id="themeBtn" type="button">Toggle light/dark</button>
 </header>
 <div class="layout">
 <nav id="toc">
+  <div class="mod">Quick Reference (SQL Server)</div>
+  <a href="#qr-select" class="sub">SELECT practice queries</a>
+  <a href="#qr-joins" class="sub">Joins practice</a>
+  <a href="#qr-proc" class="sub">Stored procedure basics</a>
+  <a href="#qr-dml" class="sub">INSERT / UPDATE / DELETE</a>
+  <a href="#qr-funcs" class="sub">Text, date &amp; other functions</a>
+  <a href="#qr-constraints" class="sub">Constraints &amp; join types</a>
+  <a href="#qr-cmds" class="sub">Command categories &amp; ranking</a>
+  <a href="#qr-important" class="sub">Important questions &amp; setup</a>
   <div class="mod">1 · Foundations</div>
   <a href="#schema" class="sub">Sample schema</a>
   <a href="#basics" class="sub">SELECT, filters, NULL</a>
@@ -92,10 +109,453 @@ footer{text-align:center;color:var(--muted);padding:24px;font-size:.85rem;border
   <a href="#proc-compare" class="sub">Comparison &amp; Q&amp;A</a>
   <div class="mod">6 · Interview</div>
   <a href="#queries" class="sub">Classic query problems</a>
+  <a href="#practice" class="sub">Practice set (Level 2→4)</a>
   <a href="#qa" class="sub">Concept Q&amp;A</a>
   <a href="#cheat" class="sub">Cheat sheet</a>
 </nav>
 <main>
+
+<!-- ============ 1 FOUNDATIONS ============ -->
+<!-- ============ QUICK REFERENCE ============ -->
+<section id="qr-select">
+<h2><span class="n">Q1</span>SELECT Practice Queries</h2>
+<p>Hands-on starter queries (T-SQL / SQL Server flavour) on the classic <code>Customers</code>, <code>Products</code>, <code>Suppliers</code>, <code>OrderDetails</code> tables. Table setup scripts are in <a href="#qr-important" style="color:var(--accent)">Important questions &amp; setup</a> below.</p>
+<pre data-lang="sql"><code>-- 6. Specific columns
+SELECT CustomerName, City FROM Customers;
+
+-- 7. One column
+SELECT Country FROM Customers;
+
+-- 8. Filter with WHERE
+SELECT * FROM Customers WHERE Country = 'Mexico';
+
+-- 9. AND
+SELECT * FROM Customers WHERE Country = 'Germany' AND City = 'Berlin';
+
+-- 10. OR
+SELECT * FROM Customers WHERE City = 'Berlin' OR City = 'Delhi';
+
+-- 11. NOT
+SELECT * FROM Customers WHERE NOT Country = 'Germany';
+
+-- 12. Sort descending
+SELECT * FROM Customers ORDER BY Country DESC;
+
+-- 14. NOT NULL filter
+SELECT CustomerName, ContactName, Address FROM Customers WHERE Address IS NOT NULL;
+
+-- 17. First 3 rows (SQL Server: TOP | MySQL/PostgreSQL: LIMIT 3)
+SELECT TOP 3 * FROM Customers;
+
+-- 18-22. Aggregate functions
+SELECT MIN(Price)   AS SmallestPrice FROM Products;
+SELECT MAX(Price)   AS LargestPrice  FROM Products;
+SELECT AVG(Price)   AS AveragePrice  FROM Products;
+SELECT COUNT(Price) AS PriceCount    FROM Products;
+SELECT SUM(Price)   AS TotalPrice    FROM Products;
+
+-- 23. LIKE: starts with 'a'
+SELECT * FROM Customers WHERE CustomerName LIKE 'a%';
+
+-- 24. contains 'es'
+SELECT * FROM Customers WHERE City LIKE '%es%';
+
+-- 25. _ = exactly one character  (matches London, Condon ...)
+SELECT * FROM Customers WHERE City LIKE '_ondon';
+
+-- 26. [..] character set (SQL Server only): starts with b, s or p
+SELECT * FROM Customers WHERE City LIKE '[bsp]%';
+
+-- 27. [a-c] range: starts with a, b or c
+SELECT * FROM Customers WHERE City LIKE '[a-c]%';
+
+-- 28. IN list
+SELECT * FROM Customers WHERE Country IN ('Germany', 'France', 'UK');
+
+-- 29-30. BETWEEN (inclusive) / NOT BETWEEN
+SELECT * FROM Products WHERE Price BETWEEN 10 AND 20;
+SELECT * FROM Products WHERE Price NOT BETWEEN 10 AND 20;
+
+-- 31. Aliases
+SELECT CustomerID AS ID, CustomerName AS Customer FROM Customers;
+
+-- 36. UNION (distinct, combined cities from two tables)
+SELECT City FROM Customers
+UNION
+SELECT City FROM Suppliers
+ORDER BY City;
+
+-- 37. GROUP BY
+SELECT COUNT(CustomerID) AS Customers, Country FROM Customers GROUP BY Country;
+
+-- 38. HAVING filters groups
+SELECT COUNT(CustomerID) AS Customers, Country
+FROM   Customers
+GROUP BY Country
+HAVING COUNT(CustomerID) &gt; 5;
+
+-- 39. CASE
+SELECT OrderID, Quantity,
+       CASE
+           WHEN Quantity &gt; 30 THEN 'The quantity is greater than 30'
+           WHEN Quantity = 30 THEN 'The quantity is 30'
+           ELSE 'The quantity is under 30'
+       END AS QuantityText
+FROM OrderDetails;
+
+-- 40. NULL-safe arithmetic (SQL Server: ISNULL / COALESCE; IFNULL is MySQL)
+SELECT ProductName,
+       UnitPrice * (UnitsInStock + ISNULL(UnitsOnOrder, 0)) AS StockValue
+FROM   Products;</code></pre>
+<div class="callout tip"><b class="t">Notes</b>Aliases for MAX/AVG/COUNT/SUM were renamed so each query's alias describes its result. <code>[bsp]</code> / <code>[a-c]</code> patterns work in SQL Server only; in other databases use <code>LIKE 'b%' OR LIKE 's%'</code> or a regex operator. <code>TOP</code> is SQL Server; use <code>LIMIT</code> elsewhere.</div>
+</section>
+
+<section id="qr-joins">
+<h2><span class="n">Q2</span>Joins Practice</h2>
+<pre data-lang="sql"><code>-- 32. INNER JOIN: orders that have a matching customer
+SELECT Orders.OrderID, Customers.CustomerName, Orders.OrderDate
+FROM   Orders
+INNER JOIN Customers ON Orders.CustomerID = Customers.CustomerID;
+
+-- 33. LEFT JOIN: all orders, customer name if one exists
+SELECT Orders.OrderID, Customers.CustomerName, Orders.OrderDate
+FROM   Orders
+LEFT JOIN Customers ON Orders.CustomerID = Customers.CustomerID;
+
+-- 34. RIGHT JOIN: all customers, order details if they have orders
+SELECT Orders.OrderID, Customers.CustomerName, Orders.OrderDate
+FROM   Orders
+RIGHT JOIN Customers ON Orders.CustomerID = Customers.CustomerID;
+
+-- 35. FULL OUTER JOIN: everything from both sides
+SELECT Orders.OrderID, Customers.CustomerName, Orders.OrderDate
+FROM   Orders
+FULL OUTER JOIN Customers ON Orders.CustomerID = Customers.CustomerID;</code></pre>
+</section>
+
+<section id="qr-proc">
+<h2><span class="n">Q3</span>Stored Procedure Basics (SQL Server)</h2>
+<div class="callout warn"><b class="t">Fixes to common mistakes</b><code>GO</code> is a batch separator for SSMS/sqlcmd, <b>not</b> a T-SQL statement – write <code>GO</code> on its own line <b>without a semicolon</b>. A procedure name can only be created once; use <code>CREATE OR ALTER PROCEDURE</code> (SQL Server 2016 SP1+) or give each version a different name, as below.</div>
+<pre data-lang="sql"><code>-- 1. Simple procedure
+CREATE PROCEDURE SelectAllCustomers
+AS
+SELECT * FROM Customers;
+GO
+
+EXEC SelectAllCustomers;
+
+-- 2. With one parameter
+CREATE PROCEDURE SelectCustomersByCity @City NVARCHAR(30)
+AS
+SELECT * FROM Customers WHERE City = @City;
+GO
+
+EXEC SelectCustomersByCity @City = 'London';
+
+-- 3. With multiple parameters
+CREATE PROCEDURE SelectCustomersByCityPostal @City NVARCHAR(30), @PostalCode NVARCHAR(10)
+AS
+SELECT * FROM Customers WHERE City = @City AND PostalCode = @PostalCode;
+GO
+
+EXEC SelectCustomersByCityPostal @City = 'London', @PostalCode = 'WA1 1DP';
+
+-- 4. Parameter filter inside BEGIN...END
+CREATE PROCEDURE GetEmployeesByDepartment @DepartmentID INT
+AS
+BEGIN
+    SELECT EmployeeID, FirstName, LastName, DepartmentID
+    FROM   Employees
+    WHERE  DepartmentID = @DepartmentID;
+END;
+GO
+
+-- 5. Two parameters
+CREATE PROCEDURE GetEmployeeDetails @DepartmentID INT, @JobTitle NVARCHAR(50)
+AS
+BEGIN
+    SELECT EmployeeID, FirstName, LastName
+    FROM   Employees
+    WHERE  DepartmentID = @DepartmentID AND JobTitle = @JobTitle;
+END;
+GO
+
+-- 6. IF / ELSE
+CREATE PROCEDURE CheckBonusEligibility @Salary INT
+AS
+BEGIN
+    IF @Salary &gt;= 50000
+        PRINT 'Eligible for Bonus';
+    ELSE
+        PRINT 'Not Eligible';
+END;
+GO
+
+-- 7. Variables
+CREATE PROCEDURE CountEmployees
+AS
+BEGIN
+    DECLARE @Total INT;
+    SELECT @Total = COUNT(*) FROM Employees;
+    PRINT 'Total Employees: ' + CAST(@Total AS VARCHAR(10));
+END;
+GO
+
+-- 8. Cursor (row-by-row; avoid on large tables)
+CREATE PROCEDURE ListEmployeeNames
+AS
+BEGIN
+    DECLARE @EmpName NVARCHAR(100);
+    DECLARE emp_cursor CURSOR FOR SELECT FirstName FROM Employees;
+
+    OPEN emp_cursor;
+    FETCH NEXT FROM emp_cursor INTO @EmpName;
+
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        PRINT 'Employee: ' + @EmpName;
+        FETCH NEXT FROM emp_cursor INTO @EmpName;
+    END;
+
+    CLOSE emp_cursor;
+    DEALLOCATE emp_cursor;
+END;
+GO
+
+-- 9. INSERT through a procedure
+CREATE PROCEDURE AddNewEmployee @FirstName NVARCHAR(50), @LastName NVARCHAR(50), @DepartmentID INT
+AS
+BEGIN
+    INSERT INTO Employees (FirstName, LastName, DepartmentID)
+    VALUES (@FirstName, @LastName, @DepartmentID);
+END;
+GO
+
+EXEC AddNewEmployee @FirstName = 'Asha', @LastName = 'Rao', @DepartmentID = 10;</code></pre>
+<p>More advanced procedures (OUTPUT parameters, TRY…CATCH, dynamic SQL, Oracle PL/SQL) are in the <a href="#proc-mssql" style="color:var(--accent)">Stored Procedures</a> sections further down.</p>
+</section>
+
+<section id="qr-dml">
+<h2><span class="n">Q4</span>INSERT, UPDATE &amp; DELETE</h2>
+<pre data-lang="sql"><code>-- 1. INSERT one row
+INSERT INTO Customers (CustomerName, ContactName, Address, City, PostalCode, Country)
+VALUES ('Cardinal', 'Tom B. Erichsen', 'Skagen 21', 'Stavanger', '4006', 'Norway');
+
+-- 2. UPDATE (always use WHERE!)
+UPDATE Customers SET ContactName = 'rahul', City = 'delhi' WHERE CustomerID = 1;
+
+-- 3. DELETE (always use WHERE!)
+DELETE FROM Customers WHERE CustomerName = 'rahul';
+
+-- 4a. Insert ALL rows from another table
+INSERT INTO sales.addresses (street, city, state, zip_code)
+SELECT street, city, state, zip_code
+FROM   sales.customers
+ORDER BY first_name, last_name;
+
+-- 4b. Insert SOME rows from another table
+INSERT INTO sales.addresses (street, city, state, zip_code)
+SELECT street, city, state, zip_code
+FROM   sales.stores
+WHERE  city IN ('Santa Cruz', 'Baldwin');</code></pre>
+<div class="callout warn"><b class="t">Safety</b>Run the same condition as a <code>SELECT</code> first to preview affected rows, and wrap risky changes in <code>BEGIN TRAN … ROLLBACK/COMMIT</code>. Note: if <code>CustomerID</code> is declared as a plain <code>INT PRIMARY KEY</code> (see setup below), the single-row insert above must also supply a <code>CustomerID</code>, or the column must be an <code>IDENTITY</code>.</div>
+</section>
+
+<section id="qr-funcs">
+<h2><span class="n">Q5</span>Text, Date &amp; Other Functions (T-SQL)</h2>
+<h3>Text functions</h3>
+<table>
+<tr><th>Function</th><th>Example</th><th>Description</th></tr>
+<tr><td><code>UPPER()</code></td><td><code>SELECT UPPER('hello');</code></td><td>Converts text to uppercase</td></tr>
+<tr><td><code>LOWER()</code></td><td><code>SELECT LOWER('HELLO');</code></td><td>Converts text to lowercase</td></tr>
+<tr><td><code>LEN()</code></td><td><code>SELECT LEN('SQL Server');</code></td><td>Returns length of string</td></tr>
+<tr><td><code>LTRIM()</code> / <code>RTRIM()</code></td><td><code>SELECT LTRIM(' hello'); SELECT RTRIM('hello ');</code></td><td>Removes leading / trailing spaces</td></tr>
+<tr><td><code>SUBSTRING()</code></td><td><code>SELECT SUBSTRING('abcdef', 2, 3);</code></td><td>Extracts substring (start, length) → <code>bcd</code></td></tr>
+<tr><td><code>CHARINDEX()</code></td><td><code>SELECT CHARINDEX('a', 'database');</code></td><td>Finds position of a character</td></tr>
+<tr><td><code>REPLACE()</code></td><td><code>SELECT REPLACE('abcabc', 'a', 'x');</code></td><td>Replaces characters</td></tr>
+<tr><td><code>CONCAT()</code></td><td><code>SELECT CONCAT('SQL', 'Server');</code></td><td>Concatenates strings</td></tr>
+<tr><td><code>LEFT()</code> / <code>RIGHT()</code></td><td><code>SELECT LEFT('abcdef', 3); SELECT RIGHT('abcdef', 3);</code></td><td>Gets left / right part of a string</td></tr>
+<tr><td><code>CHAR()</code></td><td><code>SELECT CHAR(65);</code></td><td>Returns character from ASCII code</td></tr>
+<tr><td><code>FORMAT()</code></td><td><code>SELECT FORMAT(1234.56, 'C', 'en-IN');</code></td><td>Formats a number or date as a string</td></tr>
+</table>
+<h3>Date functions</h3>
+<table>
+<tr><th>Function</th><th>Example</th><th>Description</th></tr>
+<tr><td><code>GETDATE()</code></td><td><code>SELECT GETDATE();</code></td><td>Current system date and time</td></tr>
+<tr><td><code>CURRENT_TIMESTAMP</code></td><td><code>SELECT CURRENT_TIMESTAMP;</code></td><td>Same as <code>GETDATE()</code> (ANSI standard)</td></tr>
+<tr><td><code>GETUTCDATE()</code></td><td><code>SELECT GETUTCDATE();</code></td><td>Current UTC date and time</td></tr>
+<tr><td><code>SYSDATETIME()</code></td><td><code>SELECT SYSDATETIME();</code></td><td>Current date/time with higher precision</td></tr>
+<tr><td><code>DATEPART()</code></td><td><code>SELECT DATEPART(year, '2025-09-29');</code></td><td>Returns a part of a date as a number (year, month, weekday…)</td></tr>
+<tr><td><code>DATENAME()</code></td><td><code>SELECT DATENAME(month, GETDATE());</code></td><td>Returns the name of a date part (e.g. "August")</td></tr>
+<tr><td><code>DAY()</code> / <code>MONTH()</code> / <code>YEAR()</code></td><td><code>SELECT YEAR(GETDATE());</code></td><td>Extracts day, month or year</td></tr>
+<tr><td><code>DATEADD()</code></td><td><code>SELECT DATEADD(day, 5, '2025-09-29');</code></td><td>Adds an interval to a date</td></tr>
+<tr><td><code>DATEDIFF()</code></td><td><code>SELECT DATEDIFF(day, '2025-09-01', '2025-09-29');</code></td><td>Difference between two dates in the given unit</td></tr>
+<tr><td><code>EOMONTH()</code></td><td><code>SELECT EOMONTH('2025-09-15');</code></td><td>Last day of the month</td></tr>
+<tr><td><code>FORMAT()</code></td><td><code>SELECT FORMAT(GETDATE(), 'dd-MM-yyyy');</code></td><td>Formats date/time as a string</td></tr>
+<tr><td><code>SWITCHOFFSET()</code></td><td><code>SELECT SWITCHOFFSET(SYSDATETIMEOFFSET(), '+05:30');</code></td><td>Adjusts time zone offset</td></tr>
+<tr><td><code>CONVERT()</code></td><td><code>SELECT CONVERT(date, GETDATE());</code></td><td>Converts datetime to date (style codes available)</td></tr>
+<tr><td><code>CAST()</code></td><td><code>SELECT CAST(GETDATE() AS date);</code></td><td>ANSI way to convert types</td></tr>
+</table>
+<h3>Others: NULL handling &amp; CASE</h3>
+<table>
+<tr><th>Function</th><th>Example</th><th>Description</th></tr>
+<tr><td><code>COALESCE()</code></td><td><code>SELECT COALESCE(NULL, NULL, 'SQL');</code></td><td>First non-null value from a list</td></tr>
+<tr><td><code>ISNULL()</code></td><td><code>SELECT ISNULL(NULL, 'Default');</code></td><td>Replaces NULL with a value (SQL Server specific; two arguments)</td></tr>
+<tr><td>CASE (simple)</td><td><code>SELECT CASE Grade WHEN 'A' THEN 'Excellent' WHEN 'B' THEN 'Good' ELSE 'Average' END;</code></td><td>Compares one column against multiple values</td></tr>
+<tr><td>CASE (searched)</td><td><code>SELECT CASE WHEN Marks &gt;= 90 THEN 'A' WHEN Marks &gt;= 75 THEN 'B' ELSE 'C' END;</code></td><td>Range-based or logical conditions</td></tr>
+<tr><td>CASE (multiple criteria)</td><td><code>SELECT CASE WHEN Age &gt;= 18 AND Country = 'India' THEN 'Adult Indian' ELSE 'Other' END;</code></td><td>Combines conditions with AND/OR</td></tr>
+</table>
+</section>
+
+<section id="qr-constraints">
+<h2><span class="n">Q6</span>Constraints &amp; Join Types Cheat Table</h2>
+<h3>Constraints</h3>
+<table>
+<tr><th>Constraint</th><th>Example</th><th>Description</th></tr>
+<tr><td>PRIMARY KEY</td><td><code>CREATE TABLE Students (ID INT PRIMARY KEY);</code></td><td>Uniquely identifies each row</td></tr>
+<tr><td>FOREIGN KEY</td><td><code>FOREIGN KEY (DeptID) REFERENCES Departments(ID);</code></td><td>Links to a primary key in another table</td></tr>
+<tr><td>UNIQUE</td><td><code>CREATE TABLE Users (Email VARCHAR(100) UNIQUE);</code></td><td>All values in the column must differ</td></tr>
+<tr><td>NOT NULL</td><td><code>CREATE TABLE Products (Name VARCHAR(50) NOT NULL);</code></td><td>Prevents NULL values</td></tr>
+<tr><td>CHECK</td><td><code>CHECK (Age &gt;= 18);</code></td><td>Validates data against a condition</td></tr>
+<tr><td>DEFAULT</td><td><code>CREATE TABLE Orders (Status VARCHAR(20) DEFAULT 'Pending');</code></td><td>Value used when none is provided</td></tr>
+<tr><td>INDEX</td><td><code>CREATE INDEX idx_name ON Employees(Name);</code></td><td>Speeds up queries on those columns</td></tr>
+<tr><td>COMPOSITE KEY</td><td><code>PRIMARY KEY (OrderID, ProductID);</code></td><td>Multiple columns together form the key</td></tr>
+<tr><td>ON DELETE CASCADE</td><td><code>FOREIGN KEY (DeptID) REFERENCES Departments(ID) ON DELETE CASCADE;</code></td><td>Deleting the parent deletes child rows</td></tr>
+<tr><td>ON UPDATE CASCADE</td><td><code>FOREIGN KEY (DeptID) REFERENCES Departments(ID) ON UPDATE CASCADE;</code></td><td>Updating the parent key updates child rows</td></tr>
+</table>
+<h3>Join types</h3>
+<table>
+<tr><th>Join</th><th>Example</th><th>Description</th></tr>
+<tr><td>INNER JOIN</td><td><code>SELECT * FROM Orders INNER JOIN Customers ON Orders.CustomerID = Customers.ID;</code></td><td>Matching rows from both tables</td></tr>
+<tr><td>LEFT JOIN</td><td><code>SELECT * FROM Orders LEFT JOIN Customers ON Orders.CustomerID = Customers.ID;</code></td><td>All left rows + matched right rows</td></tr>
+<tr><td>RIGHT JOIN</td><td><code>SELECT * FROM Orders RIGHT JOIN Customers ON Orders.CustomerID = Customers.ID;</code></td><td>All right rows + matched left rows</td></tr>
+<tr><td>FULL OUTER JOIN</td><td><code>SELECT * FROM Orders FULL OUTER JOIN Customers ON Orders.CustomerID = Customers.ID;</code></td><td>All rows from both, matched where possible</td></tr>
+<tr><td>CROSS JOIN</td><td><code>SELECT * FROM Products CROSS JOIN Categories;</code></td><td>Cartesian product (all combinations)</td></tr>
+<tr><td>SELF JOIN</td><td><code>SELECT A.Name, B.Name AS Manager FROM Employees A JOIN Employees B ON A.ManagerID = B.ID;</code></td><td>Table joined with itself</td></tr>
+</table>
+<h3>Join tips</h3>
+<table>
+<tr><th>Tip</th><th>Why</th></tr>
+<tr><td>Use aliases</td><td>Cleaner, easier-to-read queries</td></tr>
+<tr><td>Check join conditions</td><td>Avoids Cartesian products or incorrect matches</td></tr>
+<tr><td>Watch for NULLs</td><td>Especially in OUTER JOINs – they affect filters and logic</td></tr>
+<tr><td>Use ON vs WHERE carefully</td><td>ON defines the join logic; WHERE filters results after joining</td></tr>
+<tr><td>Index join columns</td><td>Improves performance on large datasets</td></tr>
+<tr><td>Avoid ambiguity</td><td>Use table aliases to prevent column name conflicts</td></tr>
+<tr><td>Test with sample data</td><td>Verify logic before running on the full dataset</td></tr>
+<tr><td>Understand data relationships</td><td>Know which table is "primary" and which is the lookup/child</td></tr>
+</table>
+</section>
+
+<section id="qr-cmds">
+<h2><span class="n">Q7</span>SQL Command Categories &amp; Ranking Functions</h2>
+<table>
+<tr><th>Category</th><th>Example</th><th>Description</th></tr>
+<tr><td rowspan="4"><b>DDL</b> (Data Definition Language)</td><td><code>CREATE TABLE Students (ID INT, Name VARCHAR(50));</code></td><td>Defines or modifies database structure (tables, schemas)</td></tr>
+<tr><td><code>ALTER TABLE Students ADD Age INT;</code></td><td>Adds or modifies columns</td></tr>
+<tr><td><code>DROP TABLE Students;</code></td><td>Deletes a table</td></tr>
+<tr><td><code>TRUNCATE TABLE Students;</code></td><td>Removes all rows, resets identity (faster than DELETE)</td></tr>
+<tr><td rowspan="4"><b>DML</b> (Data Manipulation Language)</td><td><code>SELECT * FROM Students;</code></td><td>Retrieves data (often grouped as DQL)</td></tr>
+<tr><td><code>INSERT INTO Students VALUES (1, 'Ravi');</code></td><td>Adds new data</td></tr>
+<tr><td><code>UPDATE Students SET Name = 'Raj' WHERE ID = 1;</code></td><td>Modifies existing data</td></tr>
+<tr><td><code>DELETE FROM Students WHERE ID = 1;</code></td><td>Removes specific data</td></tr>
+<tr><td rowspan="2"><b>DCL</b> (Data Control Language)</td><td><code>GRANT SELECT ON Students TO User1;</code></td><td>Gives permissions to users</td></tr>
+<tr><td><code>REVOKE SELECT ON Students FROM User1;</code></td><td>Removes permissions</td></tr>
+<tr><td rowspan="3"><b>TCL</b> (Transaction Control Language)</td><td><code>BEGIN TRAN; UPDATE …; COMMIT;</code></td><td>Manages transactions (a group of DML operations)</td></tr>
+<tr><td><code>ROLLBACK;</code></td><td>Undoes changes since the last COMMIT</td></tr>
+<tr><td><code>SAVE TRANSACTION sp1;</code> (SQL Server) / <code>SAVEPOINT sp1;</code></td><td>Sets a point to roll back to within a transaction</td></tr>
+</table>
+<h3>Ranking window functions</h3>
+<table>
+<tr><th>Function</th><th>Code</th><th>Description</th></tr>
+<tr><td><code>ROW_NUMBER()</code></td><td><code>ROW_NUMBER() OVER (PARTITION BY Department ORDER BY Salary DESC)</code></td><td>Unique number per row within each department, even for ties</td></tr>
+<tr><td><code>RANK()</code></td><td><code>RANK() OVER (PARTITION BY Department ORDER BY Salary DESC)</code></td><td>Tied rows share a rank; the next rank(s) are skipped</td></tr>
+<tr><td><code>DENSE_RANK()</code></td><td><code>DENSE_RANK() OVER (PARTITION BY Department ORDER BY Salary DESC)</code></td><td>Tied rows share a rank; the next rank is consecutive</td></tr>
+</table>
+<pre data-lang="sql"><code>SELECT Department, EmpName, Salary,
+       ROW_NUMBER() OVER (PARTITION BY Department ORDER BY Salary DESC) AS row_num,
+       RANK()       OVER (PARTITION BY Department ORDER BY Salary DESC) AS rnk,
+       DENSE_RANK() OVER (PARTITION BY Department ORDER BY Salary DESC) AS dense_rnk
+FROM   Employees;</code></pre>
+</section>
+
+<section id="qr-important">
+<h2><span class="n">Q8</span>Important Questions &amp; Table Setup</h2>
+<h3>Employee with their manager (self join)</h3>
+<pre data-lang="sql"><code>SELECT E.EmpID, E.EmpName AS Employee, M.EmpName AS Manager
+FROM   Employees E
+LEFT JOIN Employees M ON E.ManagerID = M.EmpID;     -- LEFT JOIN keeps the top boss (no manager)</code></pre>
+<h3>Create the practice tables (SQL Server)</h3>
+<pre data-lang="sql"><code>-- 1. Customers
+CREATE TABLE Customers (
+    CustomerID   INT PRIMARY KEY,
+    CustomerName VARCHAR(100),
+    ContactName  VARCHAR(100),
+    Address      VARCHAR(150),
+    City         VARCHAR(100),
+    PostalCode   VARCHAR(20),
+    Country      VARCHAR(50)
+);
+
+-- 2. Bulk load a CSV into SQL Server (file must be readable by the SQL Server service)
+BULK INSERT Customers
+FROM 'D:\sql\Customer.csv'
+WITH (
+    FIELDTERMINATOR = ',',
+    ROWTERMINATOR   = '\n',      -- use '0x0a' / '\r\n' depending on file line endings
+    FIRSTROW        = 2          -- skip header row
+);
+
+-- 3. Orders
+CREATE TABLE Orders (
+    OrderID    INT PRIMARY KEY,
+    CustomerID INT,
+    EmployeeID INT,
+    OrderDate  DATE,
+    ShipperID  INT
+);
+
+-- 4. OrderDetails
+CREATE TABLE OrderDetails (
+    OrderDetailID INT PRIMARY KEY,
+    OrderID       INT,
+    ProductID     INT,
+    Quantity      INT
+);
+
+-- 5. Products
+CREATE TABLE Products (
+    ProductID   INT PRIMARY KEY,
+    ProductName VARCHAR(100),
+    SupplierID  INT,
+    CategoryID  INT,
+    Unit        VARCHAR(100),
+    Price       DECIMAL(10, 2)
+);</code></pre>
+<h3>Quick date function demo</h3>
+<pre data-lang="sql"><code>SELECT GETDATE()                                   AS now_local,
+       SYSDATETIME()                               AS now_precise,
+       DATEADD(day, 5, GETDATE())                  AS plus_5_days,
+       DATEDIFF(day, '2025-01-01', GETDATE())      AS days_since_jan1,
+       EOMONTH(GETDATE())                          AS month_end,
+       FORMAT(GETDATE(), 'dd-MM-yyyy')             AS formatted,
+       YEAR(GETDATE()) AS yr, MONTH(GETDATE()) AS mon, DAY(GETDATE()) AS dy,
+       DATEPART(weekday, GETDATE())                AS weekday_no,
+       DATENAME(month, GETDATE())                  AS month_name;</code></pre>
+<h3>Pivot-style report: orders per status for one year (conditional aggregation)</h3>
+<pre data-lang="sql"><code>SELECT
+    SUM(CASE WHEN order_status = 1 THEN 1 ELSE 0 END) AS Pending,
+    SUM(CASE WHEN order_status = 2 THEN 1 ELSE 0 END) AS Processing,
+    SUM(CASE WHEN order_status = 3 THEN 1 ELSE 0 END) AS Rejected,
+    SUM(CASE WHEN order_status = 4 THEN 1 ELSE 0 END) AS Completed,
+    COUNT(*)                                          AS Total
+FROM   sales.orders
+WHERE  YEAR(order_date) = 2018;
+
+-- Better for indexes (SARGable) – no function on the column:
+--   WHERE order_date &gt;= '2018-01-01' AND order_date &lt; '2019-01-01'</code></pre>
+<p>This returns one row with a column per status – a common interview pattern for "pivot without PIVOT". For a per-month breakdown add <code>MONTH(order_date)</code> to <code>SELECT</code> and <code>GROUP BY</code>.</p>
+</section>
 
 <!-- ============ 1 FOUNDATIONS ============ -->
 <section id="schema">
@@ -1094,6 +1554,285 @@ GROUP BY m.month ORDER BY m.month;</code></pre></div></details>
 -- MySQL: GROUP_CONCAT(name ORDER BY name SEPARATOR ', ')  | Spark: concat_ws(', ', collect_list(name))</code></pre></div></details>
 </section>
 
+<section id="practice">
+<h2><span class="n">6.1</span>Practice Set: Level 2 → Level 4</h2>
+<p>Try each task on paper or in SSMS <b>before</b> opening the solution. Problems are ordered by difficulty: <span class="lvl l2">L2</span> fundamentals, <span class="lvl l3">L3</span> interview-standard, <span class="lvl l4">L4</span> advanced. Solutions use T-SQL (SQL Server); notes give alternatives.</p>
+<table>
+<tr><th>Tables assumed</th><th>Columns</th></tr>
+<tr><td><code>Employees</code></td><td>EmpID, EmpName, Salary, DepartmentID, ManagerID, HireDate</td></tr>
+<tr><td><code>Departments</code></td><td>DepartmentID, DepartmentName</td></tr>
+<tr><td><code>Customers</code></td><td>CustomerID, CustomerName, Email, City, Country</td></tr>
+<tr><td><code>Orders</code></td><td>OrderID, CustomerID, OrderDate, Amount, Status</td></tr>
+<tr><td><code>OrderDetails</code> / <code>Products</code></td><td>OrderID, ProductID, Quantity / ProductID, ProductName, CategoryID, Price</td></tr>
+<tr><td><code>Logins</code>, <code>Events</code>, <code>Bookings</code></td><td>UserID, LoginDate / UserID, EventTime / BookingID, RoomID, StartDate, EndDate</td></tr>
+</table>
+<div class="toolbar"><button class="toggle" type="button" onclick="document.querySelectorAll('#practice details').forEach(d=>d.open=true)">Expand all</button><button class="toggle" type="button" onclick="document.querySelectorAll('#practice details').forEach(d=>d.open=false)">Collapse all</button></div>
+
+<h3>Level 2 – Fundamentals</h3>
+<details><summary>P1. Show the 5 highest-paid employees in department 10 who earn more than 60,000. <span class="lvl l2">L2</span></summary><div class="ans">
+<pre data-lang="sql"><code>SELECT TOP 5 EmpName, Salary
+FROM   Employees
+WHERE  DepartmentID = 10 AND Salary &gt; 60000
+ORDER BY Salary DESC;</code></pre></div></details>
+
+<details><summary>P2. For each department show headcount and average salary, but only for departments with more than 3 employees. <span class="lvl l2">L2</span></summary><div class="ans">
+<pre data-lang="sql"><code>SELECT DepartmentID, COUNT(*) AS Headcount, AVG(Salary) AS AvgSalary
+FROM   Employees
+GROUP BY DepartmentID
+HAVING COUNT(*) &gt; 3;</code></pre>
+<p>Aggregate conditions belong in <code>HAVING</code>, row conditions in <code>WHERE</code>.</p></div></details>
+
+<details><summary>P3. List every customer with their order IDs, including customers who have never ordered. <span class="lvl l2">L2</span></summary><div class="ans">
+<pre data-lang="sql"><code>SELECT c.CustomerName, o.OrderID, o.OrderDate
+FROM   Customers c
+LEFT JOIN Orders o ON o.CustomerID = c.CustomerID;</code></pre>
+<p>Customers without orders get NULL in the order columns. Start from the table whose rows must all appear.</p></div></details>
+
+<details><summary>P4. Return all orders placed in March 2025 in a way that can use an index on OrderDate. <span class="lvl l2">L2</span></summary><div class="ans">
+<pre data-lang="sql"><code>SELECT OrderID, CustomerID, Amount
+FROM   Orders
+WHERE  OrderDate &gt;= '2025-03-01' AND OrderDate &lt; '2025-04-01';   -- not MONTH(OrderDate) = 3</code></pre>
+<p>A half-open date range is index-friendly (SARGable) and correct for DATETIME values with times.</p></div></details>
+
+<details><summary>P5. Total completed sales per customer in 2025, highest first. <span class="lvl l2">L2</span></summary><div class="ans">
+<pre data-lang="sql"><code>SELECT c.CustomerName, SUM(o.Amount) AS TotalSales
+FROM   Customers c
+JOIN   Orders o ON o.CustomerID = c.CustomerID
+WHERE  o.Status = 'DONE' AND o.OrderDate &gt;= '2025-01-01' AND o.OrderDate &lt; '2026-01-01'
+GROUP BY c.CustomerName
+ORDER BY TotalSales DESC;</code></pre></div></details>
+
+<details><summary>P6. Classify employees as High (≥120k), Mid (≥80k) or Low and count how many are in each band. <span class="lvl l2">L2</span></summary><div class="ans">
+<pre data-lang="sql"><code>SELECT Band, COUNT(*) AS Employees
+FROM (
+    SELECT CASE WHEN Salary &gt;= 120000 THEN 'High'
+                WHEN Salary &gt;=  80000 THEN 'Mid'
+                ELSE 'Low' END AS Band
+    FROM Employees
+) t
+GROUP BY Band;</code></pre></div></details>
+
+<h3>Level 3 – Interview standard</h3>
+<details><summary>P7. Top 2 earners in every department (ties share a rank). <span class="lvl l3">L3</span></summary><div class="ans">
+<pre data-lang="sql"><code>SELECT DepartmentID, EmpName, Salary
+FROM (
+    SELECT *, DENSE_RANK() OVER (PARTITION BY DepartmentID ORDER BY Salary DESC) AS rnk
+    FROM Employees
+) t
+WHERE rnk &lt;= 2;</code></pre>
+<p>Window functions can't be filtered directly, so wrap them in a subquery or CTE. Use <code>ROW_NUMBER</code> if you need exactly 2 rows per department.</p></div></details>
+
+<details><summary>P8. Employees who earn more than the average salary of their own department. <span class="lvl l3">L3</span></summary><div class="ans">
+<pre data-lang="sql"><code>-- Window version (one pass)
+SELECT EmpName, DepartmentID, Salary
+FROM (
+    SELECT *, AVG(Salary) OVER (PARTITION BY DepartmentID) AS DeptAvg FROM Employees
+) t
+WHERE Salary &gt; DeptAvg;
+
+-- Correlated subquery version
+SELECT e.EmpName, e.DepartmentID, e.Salary
+FROM   Employees e
+WHERE  e.Salary &gt; (SELECT AVG(Salary) FROM Employees WHERE DepartmentID = e.DepartmentID);</code></pre></div></details>
+
+<details><summary>P9. Customers who have never placed an order (without using NOT IN). <span class="lvl l3">L3</span></summary><div class="ans">
+<pre data-lang="sql"><code>SELECT c.CustomerID, c.CustomerName
+FROM   Customers c
+WHERE  NOT EXISTS (SELECT 1 FROM Orders o WHERE o.CustomerID = c.CustomerID);</code></pre>
+<p><code>NOT IN</code> returns nothing if the subquery contains a NULL; <code>NOT EXISTS</code> is NULL-safe.</p></div></details>
+
+<details><summary>P10. Customers table has duplicate emails. Find them, then delete the extras keeping the lowest CustomerID. <span class="lvl l3">L3</span></summary><div class="ans">
+<pre data-lang="sql"><code>-- Find
+SELECT Email, COUNT(*) AS Copies FROM Customers GROUP BY Email HAVING COUNT(*) &gt; 1;
+
+-- Delete (SQL Server allows deleting through a CTE)
+WITH d AS (
+    SELECT ROW_NUMBER() OVER (PARTITION BY Email ORDER BY CustomerID) AS rn FROM Customers
+)
+DELETE FROM d WHERE rn &gt; 1;</code></pre>
+<p>Preview with <code>SELECT</code> first and run inside <code>BEGIN TRAN</code> so you can roll back.</p></div></details>
+
+<details><summary>P11. Daily sales with a running total and a 7-day moving average. <span class="lvl l3">L3</span></summary><div class="ans">
+<pre data-lang="sql"><code>WITH daily AS (
+    SELECT CAST(OrderDate AS date) AS d, SUM(Amount) AS amt
+    FROM   Orders
+    GROUP BY CAST(OrderDate AS date)
+)
+SELECT d, amt,
+       SUM(amt) OVER (ORDER BY d ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total,
+       AVG(amt) OVER (ORDER BY d ROWS BETWEEN 6 PRECEDING AND CURRENT ROW)         AS moving_avg_7
+FROM daily
+ORDER BY d;</code></pre>
+<p>Aggregate to one row per day first; the moving average covers the previous 6 rows plus today (days with no sales are missing rows).</p></div></details>
+
+<details><summary>P12. Month-over-month revenue growth percentage. <span class="lvl l3">L3</span></summary><div class="ans">
+<pre data-lang="sql"><code>WITH monthly AS (
+    SELECT DATEFROMPARTS(YEAR(OrderDate), MONTH(OrderDate), 1) AS m, SUM(Amount) AS revenue
+    FROM   Orders WHERE Status = 'DONE'
+    GROUP BY DATEFROMPARTS(YEAR(OrderDate), MONTH(OrderDate), 1)
+)
+SELECT m, revenue,
+       LAG(revenue) OVER (ORDER BY m) AS prev_revenue,
+       ROUND(100.0 * (revenue - LAG(revenue) OVER (ORDER BY m))
+             / NULLIF(LAG(revenue) OVER (ORDER BY m), 0), 2) AS mom_pct
+FROM monthly;</code></pre></div></details>
+
+<details><summary>P13. Find "churned" customers: last order more than 90 days ago. <span class="lvl l3">L3</span></summary><div class="ans">
+<pre data-lang="sql"><code>SELECT CustomerID, MAX(OrderDate) AS LastOrder
+FROM   Orders
+GROUP BY CustomerID
+HAVING MAX(OrderDate) &lt; DATEADD(day, -90, GETDATE());</code></pre></div></details>
+
+<details><summary>P14. For each month of 2025, show the number of orders per status as separate columns. <span class="lvl l3">L3</span></summary><div class="ans">
+<pre data-lang="sql"><code>SELECT MONTH(OrderDate) AS Mon,
+       SUM(CASE WHEN Status = 'PENDING'   THEN 1 ELSE 0 END) AS Pending,
+       SUM(CASE WHEN Status = 'DONE'      THEN 1 ELSE 0 END) AS Done,
+       SUM(CASE WHEN Status = 'CANCELLED' THEN 1 ELSE 0 END) AS Cancelled,
+       COUNT(*) AS Total
+FROM   Orders
+WHERE  OrderDate &gt;= '2025-01-01' AND OrderDate &lt; '2026-01-01'
+GROUP BY MONTH(OrderDate)
+ORDER BY Mon;</code></pre></div></details>
+
+<details><summary>P15. Departments whose total salary is above the average department total. <span class="lvl l3">L3</span></summary><div class="ans">
+<pre data-lang="sql"><code>WITH dept_total AS (
+    SELECT DepartmentID, SUM(Salary) AS Total FROM Employees GROUP BY DepartmentID
+)
+SELECT DepartmentID, Total
+FROM   dept_total
+WHERE  Total &gt; (SELECT AVG(Total) FROM dept_total);</code></pre></div></details>
+
+<details><summary>P16. The best-selling product (by quantity) in each category. <span class="lvl l3">L3</span></summary><div class="ans">
+<pre data-lang="sql"><code>WITH sold AS (
+    SELECT p.CategoryID, p.ProductName, SUM(od.Quantity) AS Qty
+    FROM   OrderDetails od JOIN Products p ON p.ProductID = od.ProductID
+    GROUP BY p.CategoryID, p.ProductName
+), r AS (
+    SELECT *, RANK() OVER (PARTITION BY CategoryID ORDER BY Qty DESC) AS rnk FROM sold
+)
+SELECT CategoryID, ProductName, Qty FROM r WHERE rnk = 1;</code></pre></div></details>
+
+<h3>Level 4 – Advanced</h3>
+<details><summary>P17. Users who logged in 3 or more days in a row (gaps and islands). <span class="lvl l4">L4</span></summary><div class="ans">
+<pre data-lang="sql"><code>WITH d AS (
+    SELECT DISTINCT UserID, LoginDate FROM Logins
+), g AS (
+    SELECT UserID, LoginDate,
+           DATEADD(day, -ROW_NUMBER() OVER (PARTITION BY UserID ORDER BY LoginDate), LoginDate) AS grp
+    FROM d
+)
+SELECT UserID, MIN(LoginDate) AS StreakStart, MAX(LoginDate) AS StreakEnd, COUNT(*) AS Days
+FROM   g
+GROUP BY UserID, grp
+HAVING COUNT(*) &gt;= 3;</code></pre>
+<p>Subtracting the row number from the date gives the same value for every date in an unbroken run – that value identifies the "island".</p></div></details>
+
+<details><summary>P18. Print the org chart with each employee's level and reporting path (recursive CTE). <span class="lvl l4">L4</span></summary><div class="ans">
+<pre data-lang="sql"><code>WITH org AS (
+    SELECT EmpID, EmpName, ManagerID, 1 AS Lvl, CAST(EmpName AS VARCHAR(500)) AS Path
+    FROM   Employees WHERE ManagerID IS NULL                          -- anchor: the top boss
+    UNION ALL
+    SELECT e.EmpID, e.EmpName, e.ManagerID, o.Lvl + 1, CAST(o.Path + ' &gt; ' + e.EmpName AS VARCHAR(500))
+    FROM   Employees e JOIN org o ON e.ManagerID = o.EmpID            -- recursive member
+)
+SELECT * FROM org ORDER BY Path
+OPTION (MAXRECURSION 100);                                            -- guard against cycles</code></pre></div></details>
+
+<details><summary>P19. Customers who ordered in every month of 2025. <span class="lvl l4">L4</span></summary><div class="ans">
+<pre data-lang="sql"><code>SELECT CustomerID
+FROM   Orders
+WHERE  OrderDate &gt;= '2025-01-01' AND OrderDate &lt; '2026-01-01'
+GROUP BY CustomerID
+HAVING COUNT(DISTINCT MONTH(OrderDate)) = 12;</code></pre>
+<p>This is "relational division": group by the entity and compare the count of distinct qualifying values with the total required.</p></div></details>
+
+<details><summary>P20. Split each user's events into sessions: a new session starts after 30 minutes of inactivity. <span class="lvl l4">L4</span></summary><div class="ans">
+<pre data-lang="sql"><code>WITH flagged AS (
+    SELECT UserID, EventTime,
+           CASE WHEN LAG(EventTime) OVER (PARTITION BY UserID ORDER BY EventTime) IS NULL
+                  OR DATEDIFF(minute, LAG(EventTime) OVER (PARTITION BY UserID ORDER BY EventTime), EventTime) &gt; 30
+                THEN 1 ELSE 0 END AS NewSession
+    FROM Events
+)
+SELECT UserID, EventTime,
+       SUM(NewSession) OVER (PARTITION BY UserID ORDER BY EventTime
+                             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS SessionNo
+FROM flagged;</code></pre>
+<p>Pattern: flag the boundary rows, then a running <code>SUM</code> of the flags numbers the groups.</p></div></details>
+
+<details><summary>P21. Median salary per department. <span class="lvl l4">L4</span></summary><div class="ans">
+<pre data-lang="sql"><code>SELECT DISTINCT DepartmentID,
+       PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY Salary) OVER (PARTITION BY DepartmentID) AS MedianSalary
+FROM   Employees;</code></pre>
+<p>In SQL Server <code>PERCENTILE_CONT</code> is an analytic function used with <code>OVER (PARTITION BY …)</code>; PostgreSQL/Oracle use it as an ordered-set aggregate with <code>GROUP BY</code>.</p></div></details>
+
+<details><summary>P22. Join orders to the customer's city <i>as it was on the order date</i> (SCD Type 2 dimension). <span class="lvl l4">L4</span></summary><div class="ans">
+<pre data-lang="sql"><code>SELECT o.OrderID, o.OrderDate, d.City
+FROM   Orders o
+JOIN   dim_customer_scd2 d
+  ON   d.CustomerID = o.CustomerID
+ AND   o.OrderDate &gt;= d.EffectiveFrom
+ AND   o.OrderDate &lt;  ISNULL(d.EffectiveTo, '9999-12-31');</code></pre>
+<p>Half-open ranges (<code>&gt;=</code> start, <code>&lt;</code> end) guarantee each order matches exactly one version.</p></div></details>
+
+<details><summary>P23. Detect overlapping room bookings. <span class="lvl l4">L4</span></summary><div class="ans">
+<pre data-lang="sql"><code>SELECT a.BookingID AS BookingA, b.BookingID AS BookingB, a.RoomID
+FROM   Bookings a
+JOIN   Bookings b
+  ON   a.RoomID = b.RoomID
+ AND   a.BookingID &lt; b.BookingID            -- each pair once
+ AND   a.StartDate &lt; b.EndDate
+ AND   b.StartDate &lt; a.EndDate;             -- the classic overlap test</code></pre></div></details>
+
+<details><summary>P24. Write a procedure that upserts an employee safely: transaction, error handling, re-raise. <span class="lvl l4">L4</span></summary><div class="ans">
+<pre data-lang="sql"><code>CREATE OR ALTER PROCEDURE dbo.usp_UpsertEmployee
+    @EmpID INT, @EmpName NVARCHAR(100), @Salary DECIMAL(12,2), @DepartmentID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+    BEGIN TRY
+        BEGIN TRAN;
+        MERGE dbo.Employees AS t
+        USING (SELECT @EmpID AS EmpID, @EmpName AS EmpName, @Salary AS Salary, @DepartmentID AS DepartmentID) AS s
+           ON t.EmpID = s.EmpID
+        WHEN MATCHED THEN UPDATE SET EmpName = s.EmpName, Salary = s.Salary, DepartmentID = s.DepartmentID
+        WHEN NOT MATCHED THEN INSERT (EmpID, EmpName, Salary, DepartmentID)
+                              VALUES (s.EmpID, s.EmpName, s.Salary, s.DepartmentID);
+        COMMIT;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT &gt; 0 ROLLBACK;
+        THROW;
+    END CATCH
+END;</code></pre></div></details>
+
+<details><summary>P25. This query is slow on a 50-million-row Orders table. Rewrite it and suggest an index. <span class="lvl l4">L4</span></summary><div class="ans">
+<pre data-lang="sql"><code>-- Slow
+SELECT * FROM Orders
+WHERE YEAR(OrderDate) = 2025 AND UPPER(Status) = 'DONE' AND CustomerID IN (SELECT CustomerID FROM Customers WHERE City = 'Pune');
+
+-- Better
+SELECT o.OrderID, o.CustomerID, o.OrderDate, o.Amount          -- only needed columns
+FROM   Orders o
+WHERE  o.OrderDate &gt;= '2025-01-01' AND o.OrderDate &lt; '2026-01-01'   -- SARGable range
+  AND  o.Status = 'DONE'                                       -- no function on the column
+  AND  EXISTS (SELECT 1 FROM Customers c WHERE c.CustomerID = o.CustomerID AND c.City = 'Pune');
+
+-- Supporting index: equality column first, then range, then included columns
+CREATE INDEX IX_Orders_Status_Date ON Orders (Status, OrderDate) INCLUDE (CustomerID, Amount);
+CREATE INDEX IX_Customers_City     ON Customers (City) INCLUDE (CustomerID);</code></pre>
+<p>Then confirm in the execution plan: index seeks instead of scans, no key lookups on the large table, and sensible row estimates.</p></div></details>
+
+<div class="callout tip"><b class="t">Score yourself</b>
+<ul>
+<li>All of P1–P6 without hints → solid <b>Level 2</b>.</li>
+<li>P7–P16: at least 8 of 10 correct on your own → <b>Level 3</b> (typical analyst / junior data engineer bar).</li>
+<li>P17–P25: at least 6 of 9, including a recursive CTE, a gaps-and-islands problem and an index/plan discussion → <b>Level 4</b>.</li>
+</ul>
+Re-do any problem you needed to peek at after a day, without looking.</div>
+</section>
+
 <section id="qa">
 <h2><span class="n">6.1</span>Concept Interview Questions &amp; Answers</h2>
 <div class="toolbar"><button class="toggle" type="button" onclick="document.querySelectorAll('#qa details').forEach(d=>d.open=true)">Expand all</button><button class="toggle" type="button" onclick="document.querySelectorAll('#qa details').forEach(d=>d.open=false)">Collapse all</button></div>
@@ -1191,6 +1930,14 @@ GROUP BY m.month ORDER BY m.month;</code></pre></div></details>
 <script>
 (function(){
   var root=document.documentElement,btn=document.getElementById('themeBtn');
+  var navBtn=document.getElementById('navBtn'),lay=document.querySelector('.layout');
+  function setNav(hidden){
+    lay.classList.toggle('nav-hidden',hidden);
+    navBtn.textContent=hidden?'☰ Show contents':'✕ Hide contents';
+    try{localStorage.setItem('navHidden',hidden?'1':'0')}catch(e){}
+  }
+  try{if(localStorage.getItem('navHidden')==='1')setNav(true);}catch(e){}
+  navBtn.addEventListener('click',function(){setNav(!lay.classList.contains('nav-hidden'))});
   try{var s=localStorage.getItem('theme');if(s)root.setAttribute('data-theme',s);
       else if(window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)root.setAttribute('data-theme','light');}catch(e){}
   btn.addEventListener('click',function(){
