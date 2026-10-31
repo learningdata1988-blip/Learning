@@ -59,6 +59,9 @@ footer{text-align:center;color:var(--muted);padding:24px;font-size:.85rem;border
 </header>
 <div class="layout">
 <nav id="toc">
+  <div class="mod">Key Concepts</div>
+  <a href="#key-concepts" class="sub">Key concepts (Hinglish)</a>
+  <a href="#key-concepts-2" class="sub">Key concepts – Part 2</a>
   <div class="mod">1 · Architecture</div>
   <a href="#arch" class="sub">Components</a>
   <a href="#session" class="sub">SparkSession</a>
@@ -101,6 +104,128 @@ footer{text-align:center;color:var(--muted);padding:24px;font-size:.85rem;border
 <main>
 
 <!-- ============ MODULE 1 ============ -->
+<section id="key-concepts">
+<h2>Key Concepts</h2>
+
+<h3>1. Managed Location</h3>
+<ul>
+<li><b>Kya hota hai:</b> Yeh ek aisi storage location hoti hai jise Databricks ya Spark khud poori tarah manage karta hai.</li>
+<li><b>Simple bhasha:</b> Agar aapne managed table banayi aur usko drop kar diya, toh uska data aur metadata dono storage se permanently delete ho jayenge.</li>
+</ul>
+
+<h3>2. External Location</h3>
+<ul>
+<li><b>Kya hota hai:</b> Yeh aapki khud ki cloud storage (jaise AWS S3 bucket ya Azure ADLS) hoti hai jise aap Spark/Databricks se connect karte ho.</li>
+<li><b>Simple bhasha:</b> Agar aapne external table drop ki, toh sirf table ka reference (metadata) khatam hota hai, lekin asli data aapke cloud storage mein safe rehta hai.</li>
+</ul>
+
+<h3>3. Data Lake</h3>
+<ul>
+<li><b>Kya hota hai:</b> Ek bohot bada centralized storage system jahan aap har tarah ka data—chahe wo structured ho (CSV, Parquet) ya unstructured (audio, video, logs)—ek hi jagah raw form mein store kar sakte hain.</li>
+</ul>
+
+<h3>4. Delta Lake</h3>
+<ul>
+<li><b>Kya hota hai:</b> Yeh Data Lake ke upar ki ek storage layer hai jo Apache Parquet files ke sath milti-julti hai, par ismein ACID transactions (reliability), Time Travel (purana data dekhna), aur data validation jaisi advanced features milti hain.</li>
+</ul>
+
+<h3>5. Delta Table</h3>
+<ul>
+<li><b>Kya hota hai:</b> Delta Lake format ke andar bani hui table jo rows aur columns mein data rakhti hai aur reliable updates/deletes support karti hai.</li>
+</ul>
+
+<h3>6. Spark Manager (Driver Node)</h3>
+<ul>
+<li><b>Kya hota hai:</b> Spark cluster ka "Boss" ya coordinator.</li>
+<li><b>Simple bhasha:</b> Jab aap code likhte ho, toh Driver us code ko samajhta hai, chote-chote tasks mein todta hai, aur Worker nodes ko kaam assign karta hai. Poora application yahi control karta hai.</li>
+</ul>
+
+<h3>7. Worker Nodes</h3>
+<ul>
+<li><b>Kya hota hai:</b> Spark cluster ke "Laborers" ya workers jo actual heavy lifting (data processing aur calculations) karte hain. Driver inhi nodes ko kaam bhejta hai.</li>
+</ul>
+
+<h3>8. Shuffling</h3>
+<ul>
+<li><b>Kya hota hai:</b> Jab data ko alag-alag worker nodes ke beech network ke through transfer karna padta hai.</li>
+<li><b>Simple bhasha:</b> Jaise aap <code>groupBy</code> ya <code>join</code> operation chalate ho, toh ek hi key ka data alag nodes se ek jagah ikattha karna padta hai—is process ko shuffling kehte hain, aur yeh network par thoda heavy padta hai.</li>
+</ul>
+
+<h3>9. Reshuffling</h3>
+<ul>
+<li><b>Kya hota hai:</b> Jab data ka distribution theek nahi hota (kisi node par bohot zyada data aur kisi par kam), toh Spark data ko dobara se re-partition karke nodes par barabar batata hai taaki performance behtar ho sake.</li>
+</ul>
+
+<h3>10. Lazy Evaluation</h3>
+<ul>
+<li><b>Kya hota hai:</b> Spark ki ek smart aadat. Jab aap transformations (jaise <code>.filter()</code>, <code>.select()</code>) likhte ho, toh Spark turant run nahi karta. Wo bas ek plan banakar chupchap baith jata hai. Jab tak aap koi Action (jaise <code>.show()</code>, <code>.count()</code>) trigger nahi karoge, tab tak Spark kuch execute nahi karega.</li>
+</ul>
+
+<h3>11. Temporary Views</h3>
+<ul>
+<li><b>Kya hota hai:</b> Ek virtual table jo sirf uss specific Spark session ke andar hi zinda rehti hai. Ispe aap SQL queries chala sakte hain bina permanent storage par table banaye. Session band hote hi view gayab ho jata hai.</li>
+</ul>
+</section>
+
+<section id="key-concepts-2">
+<h2>Key Concepts – Part 2</h2>
+
+<h3>1. Partitioning and Z-Ordering</h3>
+<ul>
+<li><b>Partitioning:</b> Jab data bohot bada hota hai, toh usko chote-chote folders (jaise <code>Year=2024/Month=10</code>) mein tod kar rakha jata hai. Isse Spark ko poora data scan nahi karna padta, bas sahi folder se data read ho jata hai.</li>
+<li><b>Z-Ordering:</b> Yeh Delta Lake ki ek technique hai jo ek hi partition ke andar multiple columns par data ko is tarah arrange karti hai ki search queries bohot fast ho jayein.</li>
+</ul>
+
+<h3>2. Broadcast Joins / MapSide Joins</h3>
+<ul>
+<li><b>Kya hota hai:</b> Jab aap ek bohot badi table ko ek bohot choti table ke sath join karte ho, toh Spark choti table ki ek copy har Worker node par bhej (broadcast kar) deta hai.</li>
+<li><b>Fayda:</b> Isse heavy data transfer (shuffling) ki zaroorat nahi padti aur join search fast ho jata hai.</li>
+</ul>
+
+<h3>3. Spark UI &amp; Performance Tuning</h3>
+<ul>
+<li><b>Spark UI:</b> Ek web-based dashboard jahan aap dekh sakte hain ki aapka Spark code kaise run ho raha hai, kahan time lag raha hai, aur kaun sa node slow chal raha hai.</li>
+<li><b>Performance Tuning:</b> Code ya cluster settings ko optimize karna (jaise memory settings, partition sizes adjust karna) taaki queries kam cost aur fast time mein execute ho sakein.</li>
+</ul>
+
+<h3>4. Time Travel &amp; Vacuum Command in Delta</h3>
+<ul>
+<li><b>Time Travel:</b> Delta Lake mein jab aap data update ya delete karte ho, toh purana data gayab nahi hota. Aap past ki kisi specific date/version par jaakar purana data wapas dekh sakte ho.</li>
+<li><b>Vacuum Command:</b> Time travel ki wajah se purani files storage mein space gherne lagti hain. <code>VACUUM</code> command run karke hum un purani, unneeded files ko storage se permanently delete karte hain space free karne ke liye.</li>
+</ul>
+
+<h3>5. Caching &amp; Persistence (<code>cache()</code> vs <code>persist()</code>)</h3>
+<ul>
+<li><b>Kya hota hai:</b> Agar aap ek hi intermediate dataframe ko baar-baar use kar rahe ho, toh usko RAM mein save kar lena taaki Spark ko har baar dobara calculation na karni pade.</li>
+<li><b>Difference:</b>
+  <ul>
+  <li><code>cache()</code> -&gt; Data ko default memory (RAM) mein save karta hai.</li>
+  <li><code>persist()</code> -&gt; Aapko option deta hai ki data RAM mein save karna hai, disk par save karna hai, ya dono par.</li>
+  </ul>
+</li>
+</ul>
+
+<h3>6. Catalyst Optimizer &amp; Tungsten Engine</h3>
+<ul>
+<li><b>Catalyst Optimizer:</b> Spark ka "Brain". Jab aap code likhte ho, toh yeh optimizer aapke code ka sabse efficient aur fastest execution plan banata hai.</li>
+<li><b>Tungsten Engine:</b> Spark ka "Engine". Yeh memory allocation aur hardware performance ko boost karke low-level code execution speed ko bohot fast kar deta hai.</li>
+</ul>
+
+<h3>7. Structured Streaming</h3>
+<ul>
+<li><b>Kya hota hai:</b> Jab data batch mein nahi, balki real-time (stream wise) aata rehta hai—jaise credit card fraud detection, live transactions, ya IoT sensors.</li>
+<li><b>Fayda:</b> Spark same DataFrame APIs ka use karke is live data ko bina rukawat process karta chalta hai.</li>
+</ul>
+
+<h3>8. Delta Lake Lakehouse Architecture (Medallion Architecture)</h3>
+<p>Data ko clean aur high quality banane ke liye 3 layers mein organize kiya jata hai:</p>
+<ul>
+<li><b>Bronze Layer (Raw Data):</b> Jaise hi external source se data aata hai, waisa hi bina transform kiye yahan save hota hai.</li>
+<li><b>Silver Layer (Cleaned Data):</b> Bronze data se duplicates, null values hatakar aur joins/filtering karke thoda clean data yahan rakha jata hai.</li>
+<li><b>Gold Layer (Business Data):</b> Business reporting aur analytics ke liye aggregate kiya hua super-clean data, jise direct dashboards (PowerBI, Tableau) connect kar sakte hain</li>
+</ul>
+</section>
+
 <section id="arch">
 <h2><span class="n">1</span>PySpark Architecture &amp; Distributed Computing</h2>
 <h3>Core components</h3>
