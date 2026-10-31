@@ -62,6 +62,7 @@ footer{text-align:center;color:var(--muted);padding:24px;font-size:.85rem;border
   <div class="mod">Key Concepts</div>
   <a href="#key-concepts" class="sub">Key concepts (Hinglish)</a>
   <a href="#key-concepts-2" class="sub">Key concepts – Part 2</a>
+  <a href="#medallion-setup" class="sub">Azure Medallion pipeline setup</a>
   <div class="mod">1 · Architecture</div>
   <a href="#arch" class="sub">Components</a>
   <a href="#session" class="sub">SparkSession</a>
@@ -224,6 +225,72 @@ footer{text-align:center;color:var(--muted);padding:24px;font-size:.85rem;border
 <li><b>Silver Layer (Cleaned Data):</b> Bronze data se duplicates, null values hatakar aur joins/filtering karke thoda clean data yahan rakha jata hai.</li>
 <li><b>Gold Layer (Business Data):</b> Business reporting aur analytics ke liye aggregate kiya hua super-clean data, jise direct dashboards (PowerBI, Tableau) connect kar sakte hain</li>
 </ul>
+</section>
+
+<section id="medallion-setup">
+<h2>Azure Databricks aur Unity Catalog ke sath End-to-End Medallion Architecture Pipeline Setup</h2>
+<p>Is step-by-step guide mein hum dekhenge ki kaise Azure Data Lake Storage (ADLS Gen2) aur Azure Databricks (Unity Catalog ke sath) ka use karke <b>Medallion Architecture (Bronze, Silver, Gold layers)</b> ki ek complete data lakehouse pipeline banayi jati hai.</p>
+
+<h3>🛠️ Step 1: Azure Resource Group Setup</h3>
+<ul>
+<li><b>Action:</b> Azure Portal mein jaakar ek naya Resource Group banao.</li>
+<li><b>Observation:</b> Jab aap Databricks workspace create karoge, toh aapko <b>do</b> Resource Groups dikhenge:
+<ol>
+<li>Ek jo aapne khud banaya hai.</li>
+<li>Ek jo Databricks khud automatically background mein banata hai (Managed Resource Group).</li>
+</ol></li>
+</ul>
+
+<h3>📁 Step 2: Storage Account &amp; Containers Setup</h3>
+<ul>
+<li><b>Action:</b> Ek Azure Storage Account (ADLS Gen2) create karo. <i>(Note: Storage account banate waqt <b>Enable hierarchical namespace (HNS)</b> ko CHECK karna mat bhoolna, tabhi folder structure sahi kaam karega).</i></li>
+<li><b>Containers/Folders Creation:</b> Apne Storage Account ke andar jaakar yeh 4 containers/folders banao:
+<ul>
+<li><code>raw</code> — Jaha external source se original files (jaise CSVs) aakar land hongi.</li>
+<li><code>bronze</code> — Raw data ko pehli baar Delta format mein store karne ke liye.</li>
+<li><code>silver</code> — Filtered, cleaned aur deduplicated data ke liye.</li>
+<li><code>gold</code> — Aggregated business-level summary data ke liye jo analytics/reporting ke kaam aata hai.</li>
+</ul></li>
+</ul>
+
+<h3>🔌 Step 3: Access Connector for Azure Databricks</h3>
+<ul>
+<li><b>Action:</b> Azure mein "Access Connector for Azure Databricks" naam ka resource create karo.</li>
+<li><b>Details:</b> Resource Group name aur ek unique connector name do. Yeh connector Databricks ko securely storage account access karne deta hai bina kisi password ya key ko hardcode kiye.</li>
+</ul>
+
+<h3>💻 Step 4: Azure Databricks Workspace Creation</h3>
+<ul>
+<li><b>Action:</b> Ek naya Azure Databricks workspace deploy karo.</li>
+<li><b>Details:</b> Apna Resource Group choose karo aur workspace type ko <b>Hybrid</b> select karo.</li>
+</ul>
+
+<h3>🔐 Step 5: IAM (Role-Based Access Control) Setup</h3>
+<ul>
+<li><b>Action:</b> Apne Storage Account par jao.</li>
+<li><b>Steps:</b> <code>Access control (IAM)</code> -&gt; <code>Add role assignment</code> -&gt; <code>Managed identity</code> select karo -&gt; Apna banaya hua <b>Access Connector</b> choose karo -&gt; Role mein <b>Storage Blob Data Contributor</b> assign kar do.</li>
+</ul>
+
+<h3>🔑 Step 6: Databricks Catalog &amp; Credentials Configuration</h3>
+<ul>
+<li><b>Action:</b> Azure Databricks workspace open karo.</li>
+<li><b>Storage Credential &amp; Connection:</b>
+<ul>
+<li><code>Catalog</code> -&gt; <code>Connect</code> -&gt; <code>Credentials</code> par jao.</li>
+<li>Ek naya credential create karo aur usme apne Access Connector ki <b>Access Connector ID</b> (jo Azure Portal mein Connector ke overview page par milti hai) paste karo.</li>
+</ul></li>
+</ul>
+
+<h3>🚀 Step 7: Spark Code &amp; SQL Implementation</h3>
+<h4>1. Storage Credential aur External Location Banana</h4>
+<pre data-lang="sql"><code>-- Databricks credential banana
+create storage credential if not exists `adls_credential`
+using connector `your_access_connector_name`;
+
+-- External Location setup karna
+create external location if not exists `raw_location`
+url 'abfss://raw@StorageaccountName.dfs.core.windows.net'
+with (storage credential `adls_credential`);</code></pre>
 </section>
 
 <section id="arch">
