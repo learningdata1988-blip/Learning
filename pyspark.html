@@ -291,6 +291,73 @@ using connector `your_access_connector_name`;
 create external location if not exists `raw_location`
 url 'abfss://raw@StorageaccountName.dfs.core.windows.net'
 with (storage credential `adls_credential`);</code></pre>
+
+<h4>2. DBFS se Files Check Karna</h4>
+<pre data-lang="bash"><code>%fs ls 'abfss://raw@storageName.dfs.core.windows.net'</code></pre>
+
+<h4>3. Catalog &amp; Schemas Banana (3-Level Namespace)</h4>
+<pre data-lang="sql"><code>-- Enterprise Catalog banana
+create catalog enterprise_catalog
+managed location 'abfss://bronze@StorageAccountName.dfs.core.windows.net';
+
+-- Medallion Layers ke liye Schemas (Databases) banana
+create schema enterprise_catalog.bronze
+managed location 'abfss://bronze@storagename.dfs.core.windows.net';
+
+create schema enterprise_catalog.silver
+managed location 'abfss://silver@storagename.dfs.core.windows.net';
+
+create schema enterprise_catalog.gold
+managed location 'abfss://gold@storagename.dfs.core.windows.net';
+
+show schemas in enterprise_catalog;</code></pre>
+
+<h4>4. Bronze Layer Pipeline (Raw to Bronze Delta)</h4>
+<pre data-lang="python"><code># Raw CSV file read karna
+raw_path = 'abfss://raw@storageName.dfs.core.windows.net'
+df = spark.read.csv(raw_path, header=True, inferSchema=True)
+display(df)
+df.printSchema()
+
+# Data ko Bronze path par Delta format mein write karna
+bronze_path = 'abfss://bronze@storagename.dfs.core.windows.net/customer/'
+df.write.mode("overwrite").format('delta').save(bronze_path)</code></pre>
+
+<pre data-lang="sql"><code>-- Bronze Delta Table Register karna
+create table enterprise_catalog.bronze.bronze_customer
+using delta
+location 'abfss://bronze@storagename.dfs.core.windows.net/customer/';</code></pre>
+
+<h4>5. Silver Layer Pipeline (Data Cleansing)</h4>
+<pre data-lang="python"><code># Bronze Delta table se data load karna
+bronze_df = spark.read.format("delta").load(
+    'abfss://bronze@storagename.dfs.core.windows.net/customer/'
+)
+
+# Data Cleaning: Duplicates aur Null values hatana
+silver_df = bronze_df.dropDuplicates().dropna()
+
+# Cleaned data ko Silver path par save karna
+silver_path = 'abfss://silver@storagename.dfs.core.windows.net/customer_clear/'
+silver_df.write.format("delta").mode("overwrite").save(silver_path)</code></pre>
+
+<pre data-lang="sql"><code>-- Silver Delta Table Register karna
+create table enterprise_catalog.silver.silver_customer
+using delta
+location 'abfss://silver@storageName.dfs.core.windows.net/customer_clear/';</code></pre>
+
+<h4>6. Gold Layer Pipeline (Business Aggregations)</h4>
+<pre data-lang="python"><code># Silver Delta table se data load karna
+silver_df = spark.read.format("delta").load(
+    'abfss://silver@storagename.dfs.core.windows.net/customer_clear/'
+)
+
+# Business Logic: Har City ke hisaab se Customer count nikalna
+gold_df = silver_df.groupBy("city").count()
+
+# Aggregated data ko Gold path par save karna
+gold_path = 'abfss://gold@storageName.dfs.core.windows.net/customer_summary/'
+gold_df.write.format("delta").mode("overwrite").save(gold_path)</code></pre>
 </section>
 
 <section id="arch">
